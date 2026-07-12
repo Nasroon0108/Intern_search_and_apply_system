@@ -64,7 +64,12 @@ function login_user(mysqli $db, string $email, string $password): array
         return ['success' => false, 'error' => 'Your account has been blocked. Contact support.'];
     }
 
-    if ($user['role'] === ROLE_COMPANY && $user['status'] === STATUS_PENDING) {
+    // Admin accounts bypass pending/verification checks
+    if ($user['role'] === ROLE_ADMIN) {
+        if ($user['status'] !== STATUS_ACTIVE) {
+            return ['success' => false, 'error' => 'Admin account is not active. Contact system administrator.'];
+        }
+    } elseif ($user['role'] === ROLE_COMPANY && $user['status'] === STATUS_PENDING) {
         // Allow login but company may have limited access until verified
     } elseif ($user['status'] !== STATUS_ACTIVE) {
         return ['success' => false, 'error' => 'Your account is not active yet. Please wait for approval.'];
