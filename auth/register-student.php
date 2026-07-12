@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_valid_csrf();
     $result = register_student($mysqli, $_POST);
     if ($result['success']) {
-        set_flash('success', 'Registration successful! You can now log in.');
+        set_flash('success', $result['message'] ?? 'Registration successful! Check your email to verify your account.');
         redirect(app_url('auth/login.php'));
     }
     $error = $result['error'];

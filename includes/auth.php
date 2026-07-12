@@ -4,6 +4,7 @@
  */
 
 require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/email.php';
 
 function init_session(): void
 {
@@ -141,8 +142,20 @@ function register_student(mysqli $db, array $data): array
         $stmt->execute();
         $stmt->close();
 
+        // Generate verification token
+        $token = bin2hex(random_bytes(32));
+        $expiresAt = date('Y-m-d H:i:s', strtotime('+24 hours'));
+        $stmt = $db->prepare('INSERT INTO email_verifications (user_id, token, expires_at) VALUES (?, ?, ?)');
+        $stmt->bind_param('iss', $userId, $token, $expiresAt);
+        $stmt->execute();
+        $stmt->close();
+
         $db->commit();
-        return ['success' => true, 'user_id' => $userId];
+
+        // Send verification email
+        send_verification_email($email, $token);
+
+        return ['success' => true, 'user_id' => $userId, 'message' => 'Registration successful! Check your email to verify your account.'];
     } catch (Throwable $e) {
         $db->rollback();
         return ['success' => false, 'error' => 'Registration failed. Please try again.'];
@@ -203,8 +216,20 @@ function register_company(mysqli $db, array $data): array
         $stmt->execute();
         $stmt->close();
 
+        // Generate verification token
+        $token = bin2hex(random_bytes(32));
+        $expiresAt = date('Y-m-d H:i:s', strtotime('+24 hours'));
+        $stmt = $db->prepare('INSERT INTO email_verifications (user_id, token, expires_at) VALUES (?, ?, ?)');
+        $stmt->bind_param('iss', $userId, $token, $expiresAt);
+        $stmt->execute();
+        $stmt->close();
+
         $db->commit();
-        return ['success' => true, 'user_id' => $userId];
+
+        // Send verification email
+        send_verification_email($email, $token);
+
+        return ['success' => true, 'user_id' => $userId, 'message' => 'Registration successful! Check your email to verify your account.'];
     } catch (Throwable $e) {
         $db->rollback();
         return ['success' => false, 'error' => 'Registration failed. Please try again.'];
@@ -239,4 +264,132 @@ function get_admin_by_user_id(mysqli $db, int $userId): ?array
     $row = $stmt->get_result()->fetch_assoc();
     $stmt->close();
     return $row ?: null;
+}
+
+/**
+ * Verify email token
+ */
+function verify_email(mysqli $db, string $token): array
+{
+    $stmt = $db->prepare(
+        'SELECT id, user_id, expires_at, verified_at FROM email_verifications 
+         WHERE token = ? AND expires_at > NOW() LIMIT 1'
+    );
+    $stmt->bind_param('s', $token);
+    $stmt->execute();
+    $verification = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if (!$verification) {
+        return ['success' => false, 'error' => 'Invalid or expired verification link.'];
+    }
+
+    if ($verification['verified_at']) {
+        return ['success' => false, 'error' => 'Email already verified.'];
+    }
+
+    $userId = $verification['user_id'];
+    
+    $db->begin_transaction();
+    try {
+        $stmt = $db->prepare('UPDATE users SET email_verified = 1, status = ? WHERE id = ?');
+        $status = STATUS_ACTIVE;
+        $stmt->bind_param('si', $status, $userId);
+        $stmt->execute();
+        $stmt->close();
+
+        $stmt = $db->prepare('UPDATE email_verifications SET verified_at = NOW() WHERE id = ?');
+        $stmt->bind_param('i', $verification['id']);
+        $stmt->execute();
+        $stmt->close();
+
+        $db->commit();
+        return ['success' => true, 'message' => 'Email verified successfully! You can now log in.'];
+    } catch (Throwable $e) {
+        $db->rollback();
+        return ['success' => false, 'error' => 'Verification failed. Please try again.'];
+    }
+}
+
+/**
+ * Initiate password reset
+ */
+function request_password_reset(mysqli $db, string $email): array
+{
+    $stmt = $db->prepare('SELECT id, email FROM users WHERE email = ? LIMIT 1');
+    $stmt->bind_param('s', $email);
+    $stmt->execute();
+    $user = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    // For security, don't reveal if email exists
+    if (!$user) {
+        return ['success' => true, 'message' => 'If an account exists with that email, a password reset link has been sent.'];
+    }
+
+    $token = bin2hex(random_bytes(32));
+    $expiresAt = date('Y-m-d H:i:s', strtotime('+1 hour'));
+
+    $stmt = $db->prepare('INSERT INTO password_resets (user_id, token, expires_at) VALUES (?, ?, ?)');
+    $stmt->bind_param('iss', $user['id'], $token, $expiresAt);
+    $stmt->execute();
+    $stmt->close();
+
+    // Send email
+    send_password_reset_email($user['email'], $token);
+
+    return ['success' => true, 'message' => 'If an account exists with that email, a password reset link has been sent.'];
+}
+
+/**
+ * Reset password with token
+ */
+function reset_password(mysqli $db, string $token, string $newPassword, string $confirmPassword): array
+{
+    if ($newPassword !== $confirmPassword) {
+        return ['success' => false, 'error' => 'Passwords do not match.'];
+    }
+
+    if ($pwdError = validate_password($newPassword)) {
+        return ['success' => false, 'error' => $pwdError];
+    }
+
+    $stmt = $db->prepare(
+        'SELECT id, user_id, expires_at, used FROM password_resets 
+         WHERE token = ? AND expires_at > NOW() LIMIT 1'
+    );
+    $stmt->bind_param('s', $token);
+    $stmt->execute();
+    $reset = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if (!$reset) {
+        return ['success' => false, 'error' => 'Invalid or expired password reset link.'];
+    }
+
+    if ($reset['used']) {
+        return ['success' => false, 'error' => 'This password reset link has already been used.'];
+    }
+
+    $hash = password_hash($newPassword, PASSWORD_DEFAULT);
+    $userId = $reset['user_id'];
+
+    $db->begin_transaction();
+    try {
+        $stmt = $db->prepare('UPDATE users SET password_hash = ? WHERE id = ?');
+        $stmt->bind_param('si', $hash, $userId);
+        $stmt->execute();
+        $stmt->close();
+
+        $stmt = $db->prepare('UPDATE password_resets SET used = 1 WHERE id = ?');
+        $stmt->bind_param('i', $reset['id']);
+        $stmt->execute();
+        $stmt->close();
+
+        $db->commit();
+        return ['success' => true, 'message' => 'Password reset successfully! You can now log in.'];
+    } catch (Throwable $e) {
+        $db->rollback();
+        return ['success' => false, 'error' => 'Password reset failed. Please try again.'];
+    }
 }
