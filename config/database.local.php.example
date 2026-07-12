@@ -1,0 +1,10 @@
+<?php
+/**
+ * Copy to database.local.php and adjust for your environment.
+ */
+return [
+    'host' => 'localhost',
+    'user' => 'root',
+    'pass' => '',
+    'name' => 'internconnect_sl',
+];

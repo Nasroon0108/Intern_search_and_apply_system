@@ -1,0 +1,16 @@
+# Uploads (keep folder structure via .gitkeep)
+uploads/cvs/*
+uploads/photos/*
+uploads/cover_letters/*
+uploads/logos/*
+!uploads/**/.gitkeep
+
+# Environment overrides
+config/database.local.php
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
