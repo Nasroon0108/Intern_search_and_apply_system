@@ -1,126 +1,177 @@
 <?php
-$pageTitle = 'Student Dashboard';
+$pageTitle = 'Dashboard';
 require_once dirname(__DIR__) . '/includes/header.php';
 require_once dirname(__DIR__) . '/config/database.php';
 
 require_role(ROLE_STUDENT);
 
-$student = get_student_by_user_id($mysqli, current_user_id());
-if (!$student) {
-    die('Student profile not found.');
-}
+$userId = current_user_id();
+$student = get_student_by_user_id($mysqli, $userId);
 
-// Application stats (Phase 2 will populate)
-$stats = ['total' => 0, 'pending' => 0, 'shortlisted' => 0, 'accepted' => 0];
+// Get statistics
+$stmt = $mysqli->prepare('SELECT COUNT(*) as total FROM applications WHERE student_id = ?');
+$stmt->bind_param('i', $student['id']);
+$stmt->execute();
+$totalApplications = $stmt->get_result()->fetch_assoc()['total'];
+$stmt->close();
+
+$stmt = $mysqli->prepare('SELECT COUNT(*) as total FROM applications WHERE student_id = ? AND status IN (?, ?)');
+$stmt->bind_param('iss', $student['id'], $status1 = 'shortlisted', $status2 = 'interview');
+$stmt->execute();
+$shortlisted = $stmt->get_result()->fetch_assoc()['total'];
+$stmt->close();
+
+$stmt = $mysqli->prepare('SELECT COUNT(*) as total FROM applications WHERE student_id = ? AND status = ?');
+$stmt->bind_param('is', $student['id'], $status = 'accepted');
+$stmt->execute();
+$accepted = $stmt->get_result()->fetch_assoc()['total'];
+$stmt->close();
+
+$stmt = $mysqli->prepare('SELECT COUNT(*) as total FROM favorites WHERE student_id = ?');
+$stmt->bind_param('i', $student['id']);
+$stmt->execute();
+$savedInternships = $stmt->get_result()->fetch_assoc()['total'];
+$stmt->close();
+
+// Get recent applications
 $stmt = $mysqli->prepare(
-    'SELECT status, COUNT(*) AS cnt FROM applications WHERE student_id = ? GROUP BY status'
+    'SELECT a.*, i.title, c.company_name 
+     FROM applications a
+     JOIN internships i ON i.id = a.internship_id
+     JOIN companies c ON c.id = i.company_id
+     WHERE a.student_id = ?
+     ORDER BY a.applied_at DESC
+     LIMIT 5'
 );
 $stmt->bind_param('i', $student['id']);
 $stmt->execute();
-$result = $stmt->get_result();
-while ($row = $result->fetch_assoc()) {
-    $stats['total'] += (int) $row['cnt'];
-    $key = $row['status'];
-    if (isset($stats[$key])) {
-        $stats[$key] = (int) $row['cnt'];
-    }
-}
+$recentApplications = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
-
-$completion = (int) ($student['profile_completion'] ?? 0);
 ?>
 
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <div>
-            <h1 class="h3 mb-1">Welcome, <?= e($student['full_name']) ?></h1>
-            <p class="text-muted mb-0">Student Dashboard</p>
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Welcome, <?= e($student['full_name']) ?>!</h2>
+            <p class="text-muted">Here's your internship application overview</p>
         </div>
-        <span class="badge bg-primary fs-6">Profile <?= $completion ?>% complete</span>
+        <div class="col-md-4 text-md-end">
+            <a href="<?= e(app_url('internships.php')) ?>" class="btn btn-primary">Find Internships</a>
+        </div>
     </div>
 
     <div class="row g-4 mb-4">
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm stat-widget">
+            <div class="card border-0 shadow-sm text-center">
                 <div class="card-body">
-                    <div class="text-muted small">Total Applications</div>
-                    <div class="h3 mb-0"><?= $stats['total'] ?></div>
+                    <div class="display-6 text-primary mb-2"><?= e($totalApplications) ?></div>
+                    <p class="text-muted mb-0">Total Applications</p>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm stat-widget">
+            <div class="card border-0 shadow-sm text-center">
                 <div class="card-body">
-                    <div class="text-muted small">Pending</div>
-                    <div class="h3 mb-0 text-warning"><?= $stats['pending'] ?></div>
+                    <div class="display-6 text-info mb-2"><?= e($shortlisted) ?></div>
+                    <p class="text-muted mb-0">Shortlisted</p>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm stat-widget">
+            <div class="card border-0 shadow-sm text-center">
                 <div class="card-body">
-                    <div class="text-muted small">Shortlisted</div>
-                    <div class="h3 mb-0 text-info"><?= $stats['shortlisted'] ?></div>
+                    <div class="display-6 text-success mb-2"><?= e($accepted) ?></div>
+                    <p class="text-muted mb-0">Offers</p>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm stat-widget">
+            <div class="card border-0 shadow-sm text-center">
                 <div class="card-body">
-                    <div class="text-muted small">Accepted</div>
-                    <div class="h3 mb-0 text-success"><?= $stats['accepted'] ?></div>
+                    <div class="display-6 text-warning mb-2"><?= e($savedInternships) ?></div>
+                    <p class="text-muted mb-0">Saved Internships</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row g-4">
+    <div class="row">
         <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white">
-                    <h2 class="h5 mb-0">Quick Actions</h2>
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Applications</h5>
+                    <a href="<?= e(app_url('student/applications.php')) ?>" class="btn btn-sm btn-outline-primary">View All</a>
                 </div>
                 <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-sm-6">
-                            <a href="#" class="btn btn-outline-primary w-100 disabled">
-                                <i class="bi bi-search me-1"></i> Browse Internships <small>(Phase 2)</small>
-                            </a>
+                    <?php if (count($recentApplications) > 0): ?>
+                        <div class="list-group">
+                            <?php foreach ($recentApplications as $app): ?>
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1"><?= e($app['title']) ?></h6>
+                                            <p class="text-muted small mb-1"><?= e($app['company_name']) ?></p>
+                                            <small class="text-muted">
+                                                Applied: <?= e(date('M j, Y', strtotime($app['applied_at']))) ?>
+                                            </small>
+                                        </div>
+                                        <div class="text-end">
+                                            <?php 
+                                                $statusClass = match($app['status']) {
+                                                    'pending' => 'warning',
+                                                    'shortlisted' => 'info',
+                                                    'interview' => 'primary',
+                                                    'accepted' => 'success',
+                                                    'rejected' => 'danger',
+                                                    default => 'secondary'
+                                                };
+                                            ?>
+                                            <span class="badge bg-<?= e($statusClass) ?> text-capitalize"><?= e($app['status']) ?></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
                         </div>
-                        <div class="col-sm-6">
-                            <a href="#" class="btn btn-outline-primary w-100 disabled">
-                                <i class="bi bi-person me-1"></i> Edit Profile <small>(Phase 2)</small>
-                            </a>
-                        </div>
-                        <div class="col-sm-6">
-                            <a href="#" class="btn btn-outline-primary w-100 disabled">
-                                <i class="bi bi-file-earmark-pdf me-1"></i> Manage CVs <small>(Phase 2)</small>
-                            </a>
-                        </div>
-                        <div class="col-sm-6">
-                            <a href="#" class="btn btn-outline-primary w-100 disabled">
-                                <i class="bi bi-heart me-1"></i> Saved Internships <small>(Phase 2)</small>
-                            </a>
-                        </div>
-                    </div>
+                    <?php else: ?>
+                        <p class="text-muted text-center py-4">No applications yet. <a href="<?= e(app_url('internships.php')) ?>">Start applying</a></p>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
+
         <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="<?= e(app_url('student/profile.php')) ?>" class="list-group-item list-group-item-action">
+                        <i class="bi bi-person"></i> Complete Profile
+                    </a>
+                    <a href="<?= e(app_url('internships.php')) ?>" class="list-group-item list-group-item-action">
+                        <i class="bi bi-search"></i> Search Internships
+                    </a>
+                    <a href="<?= e(app_url('student/applications.php')) ?>" class="list-group-item list-group-item-action">
+                        <i class="bi bi-briefcase"></i> View Applications
+                    </a>
+                    <a href="<?= e(app_url('student/saved.php')) ?>" class="list-group-item list-group-item-action">
+                        <i class="bi bi-heart"></i> Saved Internships
+                    </a>
+                </div>
+            </div>
+
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white">
-                    <h2 class="h5 mb-0">Your Profile</h2>
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0">Profile Completion</h5>
                 </div>
                 <div class="card-body">
-                    <ul class="list-unstyled small mb-0">
-                        <li class="mb-2"><strong>University:</strong> <?= e($student['university'] ?: 'Not set') ?></li>
-                        <li class="mb-2"><strong>District:</strong> <?= e($student['district'] ?: 'Not set') ?></li>
-                        <li class="mb-2"><strong>Phone:</strong> <?= e($student['phone'] ?: 'Not set') ?></li>
-                        <li><strong>Email:</strong> <?= e($_SESSION['user_email']) ?></li>
-                    </ul>
-                    <div class="progress mt-3" style="height: 8px;">
-                        <div class="progress-bar" style="width: <?= $completion ?>%"></div>
+                    <div class="progress mb-3" style="height: 25px;">
+                        <div class="progress-bar" role="progressbar" style="width: <?= e($student['profile_completion']) ?>%;" aria-valuenow="<?= e($student['profile_completion']) ?>" aria-valuemin="0" aria-valuemax="100">
+                            <?= e($student['profile_completion']) ?>%
+                        </div>
                     </div>
+                    <p class="small text-muted mb-2">Complete your profile to attract more internship opportunities.</p>
+                    <a href="<?= e(app_url('student/profile.php')) ?>" class="btn btn-sm btn-outline-primary w-100">Edit Profile</a>
                 </div>
             </div>
         </div>
