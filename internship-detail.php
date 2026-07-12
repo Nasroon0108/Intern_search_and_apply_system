@@ -1,7 +1,7 @@
 <?php
 $pageTitle = 'Internship Details';
-require_once dirname(__DIR__) . '/includes/header.php';
-require_once dirname(__DIR__) . '/config/database.php';
+require_once 'includes/header.php';
+require_once 'config/database.php';
 
 init_session();
 
@@ -51,6 +51,7 @@ $stmt->close();
 // Check if student has already applied
 $alreadyApplied = false;
 $application = null;
+$isSaved = false;
 if (is_logged_in() && current_user_role() === ROLE_STUDENT) {
     $userId = current_user_id();
     $student = get_student_by_user_id($mysqli, $userId);
@@ -61,13 +62,51 @@ if (is_logged_in() && current_user_role() === ROLE_STUDENT) {
     $application = $stmt->get_result()->fetch_assoc();
     $stmt->close();
     $alreadyApplied = ($application !== null);
+
+    // Check if saved
+    $stmt = $mysqli->prepare('SELECT id FROM favorites WHERE student_id = ? AND internship_id = ?');
+    $stmt->bind_param('ii', $student['id'], $internshipId);
+    $stmt->execute();
+    $isSaved = ($stmt->get_result()->fetch_assoc() !== null);
+    $stmt->close();
+}
+
+// Handle save/unsave
+if (isset($_GET['toggle_save'])) {
+    if (!is_logged_in() || current_user_role() !== ROLE_STUDENT) {
+        redirect(app_url('auth/login.php'));
+    }
+
+    verify_csrf();
+    
+    $userId = current_user_id();
+    $student = get_student_by_user_id($mysqli, $userId);
+
+    if ($isSaved) {
+        $stmt = $mysqli->prepare('DELETE FROM favorites WHERE student_id = ? AND internship_id = ?');
+        $stmt->bind_param('ii', $student['id'], $internshipId);
+        $stmt->execute();
+        $stmt->close();
+        $isSaved = false;
+        flash('success', 'Removed from saved internships');
+    } else {
+        $stmt = $mysqli->prepare('INSERT INTO favorites (student_id, internship_id) VALUES (?, ?)');
+        $stmt->bind_param('ii', $student['id'], $internshipId);
+        if ($stmt->execute()) {
+            $isSaved = true;
+            flash('success', 'Added to saved internships');
+        }
+        $stmt->close();
+    }
+
+    redirect(app_url("internship-detail.php?id=$internshipId"));
 }
 
 // Handle apply
 $applyError = '';
 $applyMessage = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply'])) {
-    require_valid_csrf();
+    verify_csrf();
     
     if (!is_logged_in() || current_user_role() !== ROLE_STUDENT) {
         $applyError = 'You must be logged in as a student to apply.';
@@ -92,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply'])) {
             } else {
                 // Create application
                 $stmt = $mysqli->prepare(
-                    'INSERT INTO applications (student_id, internship_id, cv_id, cover_letter, status) VALUES (?, ?, ?, ?, ?)'
+                    'INSERT INTO applications (student_id, internship_id, cv_id, cover_letter, status, applied_at) VALUES (?, ?, ?, ?, ?, NOW())'
                 );
                 $appStatus = 'pending';
                 $stmt->bind_param('iiiis', $student['id'], $internshipId, $cvId, $coverLetter, $appStatus);
@@ -115,7 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply'])) {
 // Get student's CVs if logged in
 $studentCvs = [];
 if (is_logged_in() && current_user_role() === ROLE_STUDENT && $student) {
-    $stmt = $mysqli->prepare('SELECT * FROM student_cvs WHERE student_id = ? ORDER BY is_primary DESC');
+    $stmt = $mysqli->prepare('SELECT * FROM student_cvs WHERE student_id = ? ORDER BY is_primary DESC, uploaded_at DESC');
     $stmt->bind_param('i', $student['id']);
     $stmt->execute();
     $studentCvs = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -220,6 +259,13 @@ if (is_logged_in() && current_user_role() === ROLE_STUDENT && $student) {
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm sticky-top" style="top: 20px;">
                 <div class="card-body">
+                    <?php if (is_logged_in() && current_user_role() === ROLE_STUDENT): ?>
+                        <a href="<?= e(app_url('internship-detail.php?id=' . $internshipId . '&toggle_save=1&' . csrf_token_name() . '=' . csrf_token_value())) ?>" class="btn btn-<?= $isSaved ? 'danger' : 'outline-primary' ?> w-100 mb-2">
+                            <i class="bi bi-<?= $isSaved ? 'heart-fill' : 'heart' ?>"></i>
+                            <?= $isSaved ? 'Remove from Saved' : 'Save Internship' ?>
+                        </a>
+                    <?php endif; ?>
+
                     <?php if (!is_logged_in()): ?>
                         <a href="<?= e(app_url('auth/login.php')) ?>" class="btn btn-primary w-100 mb-2">Login to Apply</a>
                         <p class="text-center text-muted small mb-0">Don't have an account? <a href="<?= e(app_url('auth/register-student.php')) ?>">Register</a></p>
@@ -241,18 +287,20 @@ if (is_logged_in() && current_user_role() === ROLE_STUDENT && $student) {
                                     <option value="">Choose a CV</option>
                                     <?php foreach ($studentCvs as $cv): ?>
                                         <option value="<?= e($cv['id']) ?>" <?= $cv['is_primary'] ? 'selected' : '' ?>>
-                                            <?= e($cv['title']) ?> <?= $cv['is_primary'] ? '(Primary)' : '' ?>
+                                            <?= e($cv['filename']) ?> <?= $cv['is_primary'] ? '(Primary)' : '' ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
                                 <?php if (count($studentCvs) === 0): ?>
-                                    <small class="text-danger">You need to upload a CV first. <a href="<?= e(app_url('student/cvs.php')) ?>">Upload CV</a></small>
+                                    <div class="alert alert-warning small mt-2 mb-0">
+                                        <a href="<?= e(app_url('student/cvs.php')) ?>">Upload a CV</a> to apply
+                                    </div>
                                 <?php endif; ?>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Cover Letter</label>
-                                <textarea class="form-control" name="cover_letter" rows="4" placeholder="Tell the company why you're interested in this opportunity..."></textarea>
+                                <textarea class="form-control" name="cover_letter" rows="5" placeholder="Optional"></textarea>
                             </div>
 
                             <button type="submit" name="apply" class="btn btn-primary w-100" <?= count($studentCvs) === 0 ? 'disabled' : '' ?>>
@@ -266,4 +314,4 @@ if (is_logged_in() && current_user_role() === ROLE_STUDENT && $student) {
     </div>
 </div>
 
-<?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
+<?php require_once 'includes/footer.php'; ?>
