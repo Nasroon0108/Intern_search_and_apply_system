@@ -1,8 +1,13 @@
 <?php
-$pageTitle = 'My Education';
-require_once dirname(__DIR__) . '/includes/header.php';
+$pageTitle   = 'My Education';
+$currentPage = 'education';
+require_once dirname(__DIR__) . '/config/config.php';
+require_once dirname(__DIR__) . '/includes/functions.php';
+require_once dirname(__DIR__) . '/includes/csrf.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/config/database.php';
 
+init_session();
 require_role(ROLE_STUDENT);
 
 $userId = current_user_id();
@@ -29,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $mysqli->prepare(
             'INSERT INTO education (student_id, institution, degree, field_of_study, start_year, end_year, gpa, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
         );
-        $stmt->bind_param('isssiiids', $student['id'], $institution, $degree, $fieldOfStudy, $startYear, $endYear, $gpa, $description);
+        $stmt->bind_param('isssiids', $student['id'], $institution, $degree, $fieldOfStudy, $startYear, $endYear, $gpa, $description);
         if ($stmt->execute()) {
             $message = 'Education added successfully!';
             $action = 'list';
@@ -41,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $mysqli->prepare(
             'UPDATE education SET institution = ?, degree = ?, field_of_study = ?, start_year = ?, end_year = ?, gpa = ?, description = ? WHERE id = ? AND student_id = ?'
         );
-        $stmt->bind_param('isssiiisi', $institution, $degree, $fieldOfStudy, $startYear, $endYear, $gpa, $description, $educationId, $student['id']);
+        $stmt->bind_param('sssiiidsi', $institution, $degree, $fieldOfStudy, $startYear, $endYear, $gpa, $description, $educationId, $student['id']);
         if ($stmt->execute()) {
             $message = 'Education updated successfully!';
             $action = 'list';
@@ -80,124 +85,65 @@ if ($action !== 'list' && $educationId) {
 }
 ?>
 
-<div class="container py-4">
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="list-group list-group-flush">
-                    <a href="<?= e(app_url('student/profile.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-person"></i> Basic Info
-                    </a>
-                    <a href="<?= e(app_url('student/education.php')) ?>" class="list-group-item list-group-item-action active">
-                        <i class="bi bi-mortarboard"></i> Education
-                    </a>
-                    <a href="<?= e(app_url('student/skills.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-star"></i> Skills
-                    </a>
-                    <a href="<?= e(app_url('student/projects.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-briefcase"></i> Projects
-                    </a>
-                    <a href="<?= e(app_url('student/certifications.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-award"></i> Certifications
-                    </a>
-                    <a href="<?= e(app_url('student/cvs.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-file-pdf"></i> CVs
-                    </a>
-                </div>
-            </div>
-        </div>
+require_once dirname(__DIR__) . '/includes/student-layout.php';
+?>
 
-        <div class="col-md-9">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Education</h5>
-                    <?php if ($action === 'list'): ?>
-                        <a href="?action=add" class="btn btn-sm btn-primary">Add Education</a>
-                    <?php else: ?>
-                        <a href="?action=list" class="btn btn-sm btn-secondary">Back</a>
-                    <?php endif; ?>
-                </div>
-                <div class="card-body">
-                    <?php if (isset($message)): ?>
-                        <div class="alert alert-success alert-dismissible fade show"><?= e($message) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
-                    <?php endif; ?>
-                    <?php if (isset($error)): ?>
-                        <div class="alert alert-danger alert-dismissible fade show"><?= e($error) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
-                    <?php endif; ?>
+<h1 class="page-title">Education</h1>
+<p class="page-sub">Add your academic qualifications and degrees</p>
 
-                    <?php if ($action === 'list'): ?>
-                        <?php if (count($educations) > 0): ?>
-                            <div class="list-group">
-                                <?php foreach ($educations as $edu): ?>
-                                    <div class="list-group-item">
-                                        <div class="d-flex justify-content-between align-items-start">
-                                            <div>
-                                                <h6 class="mb-1"><?= e($edu['degree']) ?></h6>
-                                                <p class="text-muted small mb-1"><?= e($edu['institution']) ?></p>
-                                                <?php if ($edu['field_of_study']): ?>
-                                                    <small class="text-muted"><?= e($edu['field_of_study']) ?></small>
-                                                <?php endif; ?>
-                                                <?php if ($edu['start_year'] || $edu['end_year']): ?>
-                                                    <small class="text-muted d-block">
-                                                        <?= e($edu['start_year'] ?? '') ?> - <?= e($edu['end_year'] ?? 'Present') ?>
-                                                    </small>
-                                                <?php endif; ?>
-                                            </div>
-                                            <div>
-                                                <a href="?action=edit&id=<?= e($edu['id']) ?>" class="btn btn-sm btn-outline-primary">Edit</a>
-                                                <a href="?delete=<?= e($edu['id']) ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php else: ?>
-                            <p class="text-muted text-center py-4">No education added yet. <a href="?action=add">Add one now</a></p>
-                        <?php endif; ?>
-                    <?php else: ?>
-                        <form method="post" novalidate>
-                            <?= csrf_field() ?>
-                            <input type="hidden" name="_action" value="<?= e($action) ?>">
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <label class="form-label">Institution *</label>
-                                    <input type="text" class="form-control" name="institution" required value="<?= e($education['institution'] ?? '') ?>">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Degree *</label>
-                                    <input type="text" class="form-control" name="degree" required value="<?= e($education['degree'] ?? '') ?>">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Field of Study</label>
-                                    <input type="text" class="form-control" name="field_of_study" value="<?= e($education['field_of_study'] ?? '') ?>">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Start Year</label>
-                                    <input type="number" class="form-control" name="start_year" min="1900" max="<?= date('Y') ?>" value="<?= e($education['start_year'] ?? '') ?>">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">End Year</label>
-                                    <input type="number" class="form-control" name="end_year" min="1900" max="<?= date('Y') + 10 ?>" value="<?= e($education['end_year'] ?? '') ?>">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">GPA</label>
-                                    <input type="number" class="form-control" name="gpa" min="0" max="4" step="0.01" value="<?= e($education['gpa'] ?? '') ?>">
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label">Description</label>
-                                    <textarea class="form-control" name="description" rows="3"><?= e($education['description'] ?? '') ?></textarea>
-                                </div>
-                            </div>
-                            <div class="mt-4">
-                                <button type="submit" class="btn btn-primary">Save</button>
-                                <a href="?action=list" class="btn btn-secondary">Cancel</a>
-                            </div>
-                        </form>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
+<div class="ds-card p-4">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+        <div style="font-size:.9rem;font-weight:700;color:#111827;">Education Records</div>
+        <?php if ($action === 'list'): ?>
+            <a href="?action=add" style="font-size:.8rem;font-weight:600;background:#1349cc;color:#fff;padding:.4rem .9rem;border-radius:.5rem;text-decoration:none;"><i class="bi bi-plus-lg"></i> Add Education</a>
+        <?php else: ?>
+            <a href="?action=list" style="font-size:.8rem;font-weight:500;border:1.5px solid #e8eaf0;color:#374151;padding:.4rem .9rem;border-radius:.5rem;text-decoration:none;">← Back</a>
+        <?php endif; ?>
     </div>
+
+    <?php if (isset($message)): ?><div class="alert alert-success alert-dismissible fade show py-2 px-3 small"><?= e($message) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div><?php endif; ?>
+    <?php if (isset($error)):   ?><div class="alert alert-danger  alert-dismissible fade show py-2 px-3 small"><?= e($error)   ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div><?php endif; ?>
+
+    <?php if ($action === 'list'): ?>
+        <?php if (count($educations) > 0): ?>
+            <div style="display:flex;flex-direction:column;gap:.75rem;">
+            <?php foreach ($educations as $edu): ?>
+                <div style="padding:1rem 1.25rem;border:1px solid #e8eaf0;border-radius:.6rem;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;">
+                    <div>
+                        <div style="font-weight:600;color:#111827;font-size:.9rem;"><?= e($edu['degree']) ?></div>
+                        <div style="font-size:.8rem;color:#6b7280;margin:.15rem 0;"><?= e($edu['institution']) ?></div>
+                        <?php if ($edu['field_of_study']): ?><div style="font-size:.75rem;color:#9ca3af;"><?= e($edu['field_of_study']) ?></div><?php endif; ?>
+                        <?php if ($edu['start_year'] || $edu['end_year']): ?><div style="font-size:.75rem;color:#9ca3af;"><?= e($edu['start_year'] ?? '') ?> – <?= e($edu['end_year'] ?? 'Present') ?></div><?php endif; ?>
+                    </div>
+                    <div style="display:flex;gap:.4rem;flex-shrink:0;">
+                        <a href="?action=edit&id=<?= e($edu['id']) ?>" style="font-size:.75rem;border:1.5px solid #e8eaf0;color:#374151;padding:.3rem .65rem;border-radius:.45rem;text-decoration:none;">Edit</a>
+                        <a href="?delete=<?= e($edu['id']) ?>" onclick="return confirm('Delete this record?')" style="font-size:.75rem;background:#fee2e2;color:#ef4444;padding:.3rem .65rem;border-radius:.45rem;text-decoration:none;">Delete</a>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <div style="text-align:center;padding:3rem 1rem;color:#9ca3af;"><i class="bi bi-mortarboard" style="font-size:2.5rem;display:block;margin-bottom:.75rem;color:#d1d5db;"></i>No education added yet.</div>
+        <?php endif; ?>
+    <?php else: ?>
+        <form method="post" novalidate>
+            <?= csrf_field() ?>
+            <input type="hidden" name="_action" value="<?= e($action) ?>">
+            <div class="row g-3">
+                <div class="col-12"><label class="form-label">Institution *</label><input type="text" class="form-control" name="institution" required value="<?= e($education['institution'] ?? '') ?>"></div>
+                <div class="col-md-6"><label class="form-label">Degree *</label><input type="text" class="form-control" name="degree" required value="<?= e($education['degree'] ?? '') ?>"></div>
+                <div class="col-md-6"><label class="form-label">Field of Study</label><input type="text" class="form-control" name="field_of_study" value="<?= e($education['field_of_study'] ?? '') ?>"></div>
+                <div class="col-md-6"><label class="form-label">Start Year</label><input type="number" class="form-control" name="start_year" min="1990" max="<?= date('Y') ?>" value="<?= e($education['start_year'] ?? '') ?>"></div>
+                <div class="col-md-6"><label class="form-label">End Year</label><input type="number" class="form-control" name="end_year" min="1990" max="<?= date('Y') + 10 ?>" value="<?= e($education['end_year'] ?? '') ?>"></div>
+                <div class="col-md-6"><label class="form-label">GPA</label><input type="number" class="form-control" name="gpa" min="0" max="4" step="0.01" value="<?= e($education['gpa'] ?? '') ?>"></div>
+                <div class="col-12"><label class="form-label">Description</label><textarea class="form-control" name="description" rows="3"><?= e($education['description'] ?? '') ?></textarea></div>
+            </div>
+            <div class="mt-3" style="display:flex;gap:.5rem;">
+                <button type="submit" style="background:#1349cc;color:#fff;border:none;border-radius:.6rem;padding:.6rem 1.25rem;font-weight:600;cursor:pointer;">Save</button>
+                <a href="?action=list" style="border:1.5px solid #e8eaf0;color:#374151;padding:.55rem 1rem;border-radius:.6rem;text-decoration:none;font-size:.875rem;">Cancel</a>
+            </div>
+        </form>
+    <?php endif; ?>
 </div>
 
-<?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
+<?php require_once dirname(__DIR__) . '/includes/student-layout-end.php'; ?>

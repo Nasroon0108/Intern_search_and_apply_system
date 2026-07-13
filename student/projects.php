@@ -1,8 +1,13 @@
 <?php
-$pageTitle = 'My Projects';
-require_once dirname(__DIR__) . '/includes/header.php';
+$pageTitle   = 'My Projects';
+$currentPage = 'projects';
+require_once dirname(__DIR__) . '/config/config.php';
+require_once dirname(__DIR__) . '/includes/functions.php';
+require_once dirname(__DIR__) . '/includes/csrf.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/config/database.php';
 
+init_session();
 require_role(ROLE_STUDENT);
 
 $userId = current_user_id();
@@ -72,112 +77,61 @@ if ($action !== 'list' && $projectId) {
 }
 ?>
 
-<div class="container py-4">
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="list-group list-group-flush">
-                    <a href="<?= e(app_url('student/profile.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-person"></i> Basic Info
-                    </a>
-                    <a href="<?= e(app_url('student/education.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-mortarboard"></i> Education
-                    </a>
-                    <a href="<?= e(app_url('student/skills.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-star"></i> Skills
-                    </a>
-                    <a href="<?= e(app_url('student/projects.php')) ?>" class="list-group-item list-group-item-action active">
-                        <i class="bi bi-briefcase"></i> Projects
-                    </a>
-                    <a href="<?= e(app_url('student/certifications.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-award"></i> Certifications
-                    </a>
-                    <a href="<?= e(app_url('student/cvs.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-file-pdf"></i> CVs
-                    </a>
-                </div>
-            </div>
-        </div>
+require_once dirname(__DIR__) . '/includes/student-layout.php';
+?>
 
-        <div class="col-md-9">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">My Projects</h5>
-                    <?php if ($action === 'list'): ?>
-                        <a href="?action=add" class="btn btn-sm btn-primary">Add Project</a>
-                    <?php else: ?>
-                        <a href="?action=list" class="btn btn-sm btn-secondary">Back</a>
-                    <?php endif; ?>
-                </div>
-                <div class="card-body">
-                    <?php if (isset($message)): ?>
-                        <div class="alert alert-success alert-dismissible fade show"><?= e($message) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
-                    <?php endif; ?>
+<h1 class="page-title">My Projects</h1>
+<p class="page-sub">Showcase your personal and academic projects</p>
 
-                    <?php if ($action === 'list'): ?>
-                        <?php if (count($projects) > 0): ?>
-                            <div class="list-group">
-                                <?php foreach ($projects as $p): ?>
-                                    <div class="list-group-item">
-                                        <div class="d-flex justify-content-between align-items-start">
-                                            <div>
-                                                <h6 class="mb-1"><?= e($p['title']) ?></h6>
-                                                <p class="text-muted small mb-1"><?= e(substr($p['description'] ?? '', 0, 100)) ?></p>
-                                                <?php if ($p['technologies']): ?>
-                                                    <small class="text-muted">Tech: <?= e($p['technologies']) ?></small>
-                                                <?php endif; ?>
-                                            </div>
-                                            <div>
-                                                <a href="?action=edit&id=<?= e($p['id']) ?>" class="btn btn-sm btn-outline-primary">Edit</a>
-                                                <a href="?delete=<?= e($p['id']) ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php else: ?>
-                            <p class="text-muted text-center py-4">No projects added yet.</p>
-                        <?php endif; ?>
-                    <?php else: ?>
-                        <form method="post" novalidate>
-                            <?= csrf_field() ?>
-                            <input type="hidden" name="_action" value="<?= e($action) ?>">
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <label class="form-label">Project Title *</label>
-                                    <input type="text" class="form-control" name="title" required value="<?= e($project['title'] ?? '') ?>">
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label">Description</label>
-                                    <textarea class="form-control" name="description" rows="4"><?= e($project['description'] ?? '') ?></textarea>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Start Date</label>
-                                    <input type="date" class="form-control" name="start_date" value="<?= e($project['start_date'] ?? '') ?>">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">End Date</label>
-                                    <input type="date" class="form-control" name="end_date" value="<?= e($project['end_date'] ?? '') ?>">
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label">Technologies</label>
-                                    <input type="text" class="form-control" name="technologies" placeholder="e.g. React, Node.js, MongoDB" value="<?= e($project['technologies'] ?? '') ?>">
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label">Project URL</label>
-                                    <input type="url" class="form-control" name="project_url" value="<?= e($project['project_url'] ?? '') ?>">
-                                </div>
-                            </div>
-                            <div class="mt-4">
-                                <button type="submit" class="btn btn-primary">Save</button>
-                                <a href="?action=list" class="btn btn-secondary">Cancel</a>
-                            </div>
-                        </form>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
+<div class="ds-card p-4">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+        <div style="font-size:.9rem;font-weight:700;color:#111827;">Projects</div>
+        <?php if ($action === 'list'): ?>
+            <a href="?action=add" style="font-size:.8rem;font-weight:600;background:#1349cc;color:#fff;padding:.4rem .9rem;border-radius:.5rem;text-decoration:none;"><i class="bi bi-plus-lg"></i> Add Project</a>
+        <?php else: ?>
+            <a href="?action=list" style="font-size:.8rem;font-weight:500;border:1.5px solid #e8eaf0;color:#374151;padding:.4rem .9rem;border-radius:.5rem;text-decoration:none;">← Back</a>
+        <?php endif; ?>
     </div>
+    <?php if (isset($message)): ?><div class="alert alert-success alert-dismissible fade show py-2 px-3 small"><?= e($message) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div><?php endif; ?>
+
+    <?php if ($action === 'list'): ?>
+        <?php if (count($projects) > 0): ?>
+            <div style="display:flex;flex-direction:column;gap:.75rem;">
+            <?php foreach ($projects as $p): ?>
+                <div style="padding:1rem 1.25rem;border:1px solid #e8eaf0;border-radius:.6rem;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;">
+                    <div>
+                        <div style="font-weight:600;color:#111827;font-size:.9rem;"><?= e($p['title']) ?></div>
+                        <?php if ($p['description']): ?><div style="font-size:.8rem;color:#6b7280;margin:.15rem 0;"><?= e(substr($p['description'], 0, 120)) ?></div><?php endif; ?>
+                        <?php if ($p['technologies']): ?><div style="font-size:.75rem;color:#9ca3af;">Tech: <?= e($p['technologies']) ?></div><?php endif; ?>
+                    </div>
+                    <div style="display:flex;gap:.4rem;flex-shrink:0;">
+                        <a href="?action=edit&id=<?= e($p['id']) ?>" style="font-size:.75rem;border:1.5px solid #e8eaf0;color:#374151;padding:.3rem .65rem;border-radius:.45rem;text-decoration:none;">Edit</a>
+                        <a href="?delete=<?= e($p['id']) ?>" onclick="return confirm('Delete?')" style="font-size:.75rem;background:#fee2e2;color:#ef4444;padding:.3rem .65rem;border-radius:.45rem;text-decoration:none;">Delete</a>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <div style="text-align:center;padding:3rem 1rem;color:#9ca3af;"><i class="bi bi-briefcase" style="font-size:2.5rem;display:block;margin-bottom:.75rem;color:#d1d5db;"></i>No projects added yet.</div>
+        <?php endif; ?>
+    <?php else: ?>
+        <form method="post" novalidate>
+            <?= csrf_field() ?>
+            <input type="hidden" name="_action" value="<?= e($action) ?>">
+            <div class="row g-3">
+                <div class="col-12"><label class="form-label">Project Title *</label><input type="text" class="form-control" name="title" required value="<?= e($project['title'] ?? '') ?>"></div>
+                <div class="col-12"><label class="form-label">Description</label><textarea class="form-control" name="description" rows="4"><?= e($project['description'] ?? '') ?></textarea></div>
+                <div class="col-md-6"><label class="form-label">Start Date</label><input type="date" class="form-control" name="start_date" value="<?= e($project['start_date'] ?? '') ?>"></div>
+                <div class="col-md-6"><label class="form-label">End Date</label><input type="date" class="form-control" name="end_date" value="<?= e($project['end_date'] ?? '') ?>"></div>
+                <div class="col-12"><label class="form-label">Technologies</label><input type="text" class="form-control" name="technologies" placeholder="e.g. React, Node.js, PHP" value="<?= e($project['technologies'] ?? '') ?>"></div>
+                <div class="col-12"><label class="form-label">Project URL</label><input type="url" class="form-control" name="project_url" value="<?= e($project['project_url'] ?? '') ?>"></div>
+            </div>
+            <div class="mt-3" style="display:flex;gap:.5rem;">
+                <button type="submit" style="background:#1349cc;color:#fff;border:none;border-radius:.6rem;padding:.6rem 1.25rem;font-weight:600;cursor:pointer;">Save</button>
+                <a href="?action=list" style="border:1.5px solid #e8eaf0;color:#374151;padding:.55rem 1rem;border-radius:.6rem;text-decoration:none;font-size:.875rem;">Cancel</a>
+            </div>
+        </form>
+    <?php endif; ?>
 </div>
 
-<?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
+<?php require_once dirname(__DIR__) . '/includes/student-layout-end.php'; ?>

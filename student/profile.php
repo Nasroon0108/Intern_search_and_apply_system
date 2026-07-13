@@ -1,8 +1,13 @@
 <?php
-$pageTitle = 'My Profile';
-require_once dirname(__DIR__) . '/includes/header.php';
+$pageTitle   = 'My Profile';
+$currentPage = 'profile';
+require_once dirname(__DIR__) . '/config/config.php';
+require_once dirname(__DIR__) . '/includes/functions.php';
+require_once dirname(__DIR__) . '/includes/csrf.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/config/database.php';
 
+init_session();
 require_role(ROLE_STUDENT);
 
 $userId = current_user_id();
@@ -30,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $mysqli->prepare(
             'UPDATE students SET full_name = ?, phone = ?, university = ?, degree_program = ?, gpa = ?, district = ?, province = ?, bio = ?, updated_at = NOW() WHERE user_id = ?'
         );
-        $stmt->bind_param('ssssdsss i', $fullName, $phone, $university, $degreeProgram, $gpa, $district, $province, $bio, $userId);
+        $stmt->bind_param('ssssdsssi', $fullName, $phone, $university, $degreeProgram, $gpa, $district, $province, $bio, $userId);
         if ($stmt->execute()) {
             $message = 'Profile updated successfully!';
             $student = get_student_by_user_id($mysqli, $userId);
@@ -72,125 +77,97 @@ $stmt->execute();
 $stmt->close();
 ?>
 
-<div class="container py-4">
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <?php if ($student['profile_photo']): ?>
-                        <img src="<?= e(app_url('uploads/photos/' . $student['profile_photo'])) ?>" alt="Profile" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
-                    <?php else: ?>
-                        <div class="rounded-circle bg-secondary-subtle d-inline-flex align-items-center justify-content-center mb-3" style="width: 120px; height: 120px;">
-                            <i class="bi bi-person fs-1"></i>
-                        </div>
-                    <?php endif; ?>
-                    <h5><?= e($student['full_name']) ?></h5>
-                    <p class="text-muted small mb-3"><?= e($user['email']) ?></p>
-                    <div class="mb-3">
-                        <a href="<?= e(app_url('student/upload-photo.php')) ?>" class="btn btn-sm btn-outline-primary">Upload Photo</a>
-                    </div>
-                    <hr>
-                    <div class="text-start">
-                        <small class="text-muted">Profile Completion</small>
-                        <div class="progress mt-2" style="height: 20px;">
-                            <div class="progress-bar" role="progressbar" style="width: <?= e($profileCompletion) ?>%;" aria-valuenow="<?= e($profileCompletion) ?>" aria-valuemin="0" aria-valuemax="100">
-                                <?= e($profileCompletion) ?>%
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+require_once dirname(__DIR__) . '/includes/student-layout.php';
+?>
 
-            <div class="card border-0 shadow-sm mt-3">
-                <div class="list-group list-group-flush">
-                    <a href="<?= e(app_url('student/profile.php')) ?>" class="list-group-item list-group-item-action active">
-                        <i class="bi bi-person"></i> Basic Info
-                    </a>
-                    <a href="<?= e(app_url('student/education.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-mortarboard"></i> Education
-                    </a>
-                    <a href="<?= e(app_url('student/skills.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-star"></i> Skills
-                    </a>
-                    <a href="<?= e(app_url('student/projects.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-briefcase"></i> Projects
-                    </a>
-                    <a href="<?= e(app_url('student/certifications.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-award"></i> Certifications
-                    </a>
-                    <a href="<?= e(app_url('student/cvs.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-file-pdf"></i> CVs
-                    </a>
-                </div>
-            </div>
-        </div>
+<h1 class="page-title">My Profile</h1>
+<p class="page-sub">Manage your personal information and profile details</p>
 
-        <div class="col-md-9">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0">Basic Information</h5>
+<div class="row g-4">
+    <!-- Left: photo + completion -->
+    <div class="col-md-3">
+        <div class="ds-card p-4 text-center mb-3">
+            <?php if ($student['profile_photo']): ?>
+                <img src="<?= e(app_url('uploads/photos/' . $student['profile_photo'])) ?>" alt="Profile" class="rounded-circle mb-3" style="width:100px;height:100px;object-fit:cover;">
+            <?php else: ?>
+                <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:100px;height:100px;background:#eff3ff;color:#1349cc;font-size:2.5rem;">
+                    <i class="bi bi-person"></i>
                 </div>
-                <div class="card-body">
-                    <?php if ($message): ?>
-                        <div class="alert alert-success alert-dismissible fade show"><?= e($message) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
-                    <?php endif; ?>
-                    <?php if ($error): ?>
-                        <div class="alert alert-danger alert-dismissible fade show"><?= e($error) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
-                    <?php endif; ?>
-
-                    <form method="post" novalidate>
-                        <?= csrf_field() ?>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Full Name *</label>
-                                <input type="text" class="form-control" name="full_name" required value="<?= e($student['full_name']) ?>">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Phone</label>
-                                <input type="tel" class="form-control" name="phone" value="<?= e($student['phone'] ?? '') ?>">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">University</label>
-                                <input type="text" class="form-control" name="university" value="<?= e($student['university'] ?? '') ?>">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Degree Program</label>
-                                <input type="text" class="form-control" name="degree_program" value="<?= e($student['degree_program'] ?? '') ?>">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">GPA</label>
-                                <input type="number" class="form-control" name="gpa" min="0" max="4" step="0.01" value="<?= e($student['gpa'] ?? '') ?>">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">District</label>
-                                <select class="form-select" name="district">
-                                    <option value="">Select district</option>
-                                    <?php foreach (DISTRICTS as $d): ?>
-                                        <option value="<?= e($d) ?>" <?= ($student['district'] === $d) ? 'selected' : '' ?>><?= e($d) ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Province</label>
-                                <select class="form-select" name="province">
-                                    <option value="">Select province</option>
-                                    <?php foreach (PROVINCES as $p): ?>
-                                        <option value="<?= e($p) ?>" <?= ($student['province'] === $p) ? 'selected' : '' ?>><?= e($p) ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                            <div class="col-md-6"></div>
-                            <div class="col-12">
-                                <label class="form-label">Bio</label>
-                                <textarea class="form-control" name="bio" rows="4" placeholder="Tell us about yourself..."><?= e($student['bio'] ?? '') ?></textarea>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary mt-4">Save Changes</button>
-                    </form>
+            <?php endif; ?>
+            <div style="font-weight:700;font-size:.95rem;color:#111827;"><?= e($student['full_name']) ?></div>
+            <div style="font-size:.78rem;color:#9ca3af;margin-bottom:1rem;"><?= e($user['email']) ?></div>
+            <a href="<?= e(app_url('student/upload-photo.php')) ?>" style="font-size:.8rem;font-weight:600;color:#1349cc;background:#eff3ff;padding:.45rem 1rem;border-radius:.5rem;text-decoration:none;display:inline-block;">Upload Photo</a>
+            <hr style="border-color:#e8eaf0;margin:1rem 0;">
+            <div style="text-align:left;">
+                <div style="font-size:.75rem;color:#9ca3af;margin-bottom:.4rem;">Profile Completion</div>
+                <div style="background:#e8eaf0;border-radius:2px;height:8px;overflow:hidden;margin-bottom:.3rem;">
+                    <div style="height:100%;width:<?= e($profileCompletion) ?>%;background:#1349cc;border-radius:2px;"></div>
                 </div>
+                <div style="font-size:.78rem;font-weight:700;color:#1349cc;"><?= e($profileCompletion) ?>%</div>
             </div>
         </div>
     </div>
-</div>
 
-<?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
+    <!-- Right: form -->
+    <div class="col-md-9">
+        <div class="ds-card p-4">
+            <div style="font-size:1rem;font-weight:700;color:#111827;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid #e8eaf0;">Basic Information</div>
+
+            <?php if ($message): ?>
+                <div class="alert alert-success alert-dismissible fade show py-2 px-3 small"><?= e($message) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+            <?php endif; ?>
+            <?php if ($error): ?>
+                <div class="alert alert-danger alert-dismissible fade show py-2 px-3 small"><?= e($error) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+            <?php endif; ?>
+
+            <form method="post" novalidate>
+                <?= csrf_field() ?>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Full Name *</label>
+                        <input type="text" class="form-control" name="full_name" required value="<?= e($student['full_name']) ?>">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-control" name="phone" value="<?= e($student['phone'] ?? '') ?>">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">University</label>
+                        <input type="text" class="form-control" name="university" value="<?= e($student['university'] ?? '') ?>">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Degree Program</label>
+                        <input type="text" class="form-control" name="degree_program" value="<?= e($student['degree_program'] ?? '') ?>">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">GPA</label>
+                        <input type="number" class="form-control" name="gpa" min="0" max="4" step="0.01" value="<?= e($student['gpa'] ?? '') ?>">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">District</label>
+                        <select class="form-select" name="district">
+                            <option value="">Select district</option>
+                            <?php foreach (DISTRICTS as $d): ?>
+                                <option value="<?= e($d) ?>" <?= ($student['district'] === $d) ? 'selected' : '' ?>><?= e($d) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Province</label>
+                        <select class="form-select" name="province">
+                            <option value="">Select province</option>
+                            <?php foreach (PROVINCES as $p): ?>
+                                <option value="<?= e($p) ?>" <?= ($student['province'] === $p) ? 'selected' : '' ?>><?= e($p) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Bio</label>
+                        <textarea class="form-control" name="bio" rows="4" placeholder="Tell us about yourself..."><?= e($student['bio'] ?? '') ?></textarea>
+                    </div>
+                </div>
+                <button type="submit" style="margin-top:1.25rem;background:#1349cc;color:#fff;border:none;border-radius:.6rem;padding:.65rem 1.5rem;font-weight:600;cursor:pointer;">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</div>

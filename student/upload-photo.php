@@ -1,8 +1,13 @@
 <?php
-$pageTitle = 'Upload Profile Photo';
-require_once dirname(__DIR__) . '/includes/header.php';
+$pageTitle   = 'Upload Profile Photo';
+$currentPage = 'profile';
+require_once dirname(__DIR__) . '/config/config.php';
+require_once dirname(__DIR__) . '/includes/functions.php';
+require_once dirname(__DIR__) . '/includes/csrf.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/config/database.php';
 
+init_session();
 require_role(ROLE_STUDENT);
 
 $userId = current_user_id();
@@ -57,50 +62,46 @@ if (isset($_GET['delete']) && $student['profile_photo']) {
 }
 ?>
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <h2 class="h4 mb-1">Profile Photo</h2>
-                    <p class="text-muted small mb-4">Upload or update your profile photo</p>
+require_once dirname(__DIR__) . '/includes/student-layout.php';
+?>
 
-                    <?php if ($message): ?>
-                        <div class="alert alert-success alert-dismissible fade show"><?= e($message) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
-                    <?php endif; ?>
-                    <?php if ($error): ?>
-                        <div class="alert alert-danger alert-dismissible fade show"><?= e($error) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
-                    <?php endif; ?>
+<h1 class="page-title">Profile Photo</h1>
+<p class="page-sub">Upload or update your profile picture</p>
 
-                    <div class="text-center mb-4">
-                        <?php if ($student['profile_photo']): ?>
-                            <img src="<?= e(app_url('uploads/photos/' . $student['profile_photo'])) ?>" alt="Profile" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
-                        <?php else: ?>
-                            <div class="rounded-circle bg-secondary-subtle d-inline-flex align-items-center justify-content-center mb-3" style="width: 150px; height: 150px;">
-                                <i class="bi bi-person fs-1"></i>
-                            </div>
-                        <?php endif; ?>
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="ds-card p-4 text-center">
+            <?php if ($message): ?><div class="alert alert-success alert-dismissible fade show py-2 px-3 small"><?= e($message) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div><?php endif; ?>
+            <?php if ($error):   ?><div class="alert alert-danger  alert-dismissible fade show py-2 px-3 small"><?= e($error)   ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div><?php endif; ?>
+
+            <div style="margin-bottom:1.5rem;">
+                <?php if ($student['profile_photo']): ?>
+                    <img src="<?= e(app_url('uploads/photos/'.$student['profile_photo'])) ?>" alt="Profile" class="rounded-circle" style="width:140px;height:140px;object-fit:cover;border:3px solid #e8eaf0;">
+                <?php else: ?>
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center" style="width:140px;height:140px;background:#eff3ff;color:#1349cc;font-size:3rem;border:3px solid #e8eaf0;">
+                        <i class="bi bi-person"></i>
                     </div>
-
-                    <form method="post" enctype="multipart/form-data">
-                        <?= csrf_field() ?>
-                        <div class="mb-3">
-                            <label class="form-label">Select Photo (JPG, PNG, WebP) *</label>
-                            <input type="file" class="form-control" name="photo" accept="image/jpeg,image/png,image/webp" required>
-                            <div class="form-text">Max 2 MB. Recommended: Square image (e.g., 500x500px)</div>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Upload Photo</button>
-                    </form>
-
-                    <?php if ($student['profile_photo']): ?>
-                        <a href="?delete=1" class="btn btn-outline-danger w-100 mt-2" onclick="return confirm('Delete your profile photo?')">Delete Photo</a>
-                    <?php endif; ?>
-
-                    <a href="<?= e(app_url('student/profile.php')) ?>" class="btn btn-secondary w-100 mt-2">Back to Profile</a>
-                </div>
+                <?php endif; ?>
             </div>
+
+            <form method="post" enctype="multipart/form-data">
+                <?= csrf_field() ?>
+                <div class="mb-3 text-start">
+                    <label class="form-label">Select Photo (JPG, PNG, WebP)</label>
+                    <input type="file" class="form-control" name="photo" accept="image/jpeg,image/png,image/webp" required>
+                    <div class="form-text" style="font-size:.72rem;color:#9ca3af;">Max 2 MB · Square image recommended</div>
+                </div>
+                <button type="submit" style="width:100%;background:#1349cc;color:#fff;border:none;border-radius:.6rem;padding:.65rem;font-weight:600;cursor:pointer;margin-bottom:.5rem;">Upload Photo</button>
+            </form>
+
+            <?php if ($student['profile_photo']): ?>
+                <a href="?delete=1" onclick="return confirm('Delete your profile photo?')"
+                   style="display:block;width:100%;border:1.5px solid #fee2e2;color:#ef4444;border-radius:.6rem;padding:.55rem;font-weight:500;text-decoration:none;margin-bottom:.5rem;">Delete Photo</a>
+            <?php endif; ?>
+            <a href="<?= e(app_url('student/profile.php')) ?>"
+               style="display:block;width:100%;border:1.5px solid #e8eaf0;color:#374151;border-radius:.6rem;padding:.55rem;font-size:.875rem;text-decoration:none;">← Back to Profile</a>
         </div>
     </div>
 </div>
 
-<?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
+<?php require_once dirname(__DIR__) . '/includes/student-layout-end.php'; ?>

@@ -1,8 +1,13 @@
 <?php
-$pageTitle = 'My Certifications';
-require_once dirname(__DIR__) . '/includes/header.php';
+$pageTitle   = 'My Certifications';
+$currentPage = 'certifications';
+require_once dirname(__DIR__) . '/config/config.php';
+require_once dirname(__DIR__) . '/includes/functions.php';
+require_once dirname(__DIR__) . '/includes/csrf.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/config/database.php';
 
+init_session();
 require_role(ROLE_STUDENT);
 
 $userId = current_user_id();
@@ -70,106 +75,59 @@ if ($action !== 'list' && $certId) {
 }
 ?>
 
-<div class="container py-4">
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="list-group list-group-flush">
-                    <a href="<?= e(app_url('student/profile.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-person"></i> Basic Info
-                    </a>
-                    <a href="<?= e(app_url('student/education.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-mortarboard"></i> Education
-                    </a>
-                    <a href="<?= e(app_url('student/skills.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-star"></i> Skills
-                    </a>
-                    <a href="<?= e(app_url('student/projects.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-briefcase"></i> Projects
-                    </a>
-                    <a href="<?= e(app_url('student/certifications.php')) ?>" class="list-group-item list-group-item-action active">
-                        <i class="bi bi-award"></i> Certifications
-                    </a>
-                    <a href="<?= e(app_url('student/cvs.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-file-pdf"></i> CVs
-                    </a>
-                </div>
-            </div>
-        </div>
+require_once dirname(__DIR__) . '/includes/student-layout.php';
+?>
 
-        <div class="col-md-9">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">My Certifications</h5>
-                    <?php if ($action === 'list'): ?>
-                        <a href="?action=add" class="btn btn-sm btn-primary">Add Certification</a>
-                    <?php else: ?>
-                        <a href="?action=list" class="btn btn-sm btn-secondary">Back</a>
-                    <?php endif; ?>
-                </div>
-                <div class="card-body">
-                    <?php if (isset($message)): ?>
-                        <div class="alert alert-success alert-dismissible fade show"><?= e($message) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
-                    <?php endif; ?>
+<h1 class="page-title">My Certifications</h1>
+<p class="page-sub">Add your professional certifications and courses</p>
 
-                    <?php if ($action === 'list'): ?>
-                        <?php if (count($certs) > 0): ?>
-                            <div class="list-group">
-                                <?php foreach ($certs as $c): ?>
-                                    <div class="list-group-item">
-                                        <div class="d-flex justify-content-between align-items-start">
-                                            <div>
-                                                <h6 class="mb-1"><?= e($c['title']) ?></h6>
-                                                <?php if ($c['issuer']): ?>
-                                                    <p class="text-muted small mb-1">Issued by: <?= e($c['issuer']) ?></p>
-                                                <?php endif; ?>
-                                                <?php if ($c['issue_date']): ?>
-                                                    <small class="text-muted"><?= e(date('M Y', strtotime($c['issue_date']))) ?></small>
-                                                <?php endif; ?>
-                                            </div>
-                                            <div>
-                                                <a href="?action=edit&id=<?= e($c['id']) ?>" class="btn btn-sm btn-outline-primary">Edit</a>
-                                                <a href="?delete=<?= e($c['id']) ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php else: ?>
-                            <p class="text-muted text-center py-4">No certifications added yet.</p>
-                        <?php endif; ?>
-                    <?php else: ?>
-                        <form method="post" novalidate>
-                            <?= csrf_field() ?>
-                            <input type="hidden" name="_action" value="<?= e($action) ?>">
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <label class="form-label">Certification Title *</label>
-                                    <input type="text" class="form-control" name="title" required value="<?= e($cert['title'] ?? '') ?>">
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label">Issuing Organization</label>
-                                    <input type="text" class="form-control" name="issuer" value="<?= e($cert['issuer'] ?? '') ?>">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Issue Date</label>
-                                    <input type="date" class="form-control" name="issue_date" value="<?= e($cert['issue_date'] ?? '') ?>">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Credential URL</label>
-                                    <input type="url" class="form-control" name="credential_url" value="<?= e($cert['credential_url'] ?? '') ?>">
-                                </div>
-                            </div>
-                            <div class="mt-4">
-                                <button type="submit" class="btn btn-primary">Save</button>
-                                <a href="?action=list" class="btn btn-secondary">Cancel</a>
-                            </div>
-                        </form>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
+<div class="ds-card p-4">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+        <div style="font-size:.9rem;font-weight:700;color:#111827;">Certifications</div>
+        <?php if ($action === 'list'): ?>
+            <a href="?action=add" style="font-size:.8rem;font-weight:600;background:#1349cc;color:#fff;padding:.4rem .9rem;border-radius:.5rem;text-decoration:none;"><i class="bi bi-plus-lg"></i> Add Certification</a>
+        <?php else: ?>
+            <a href="?action=list" style="font-size:.8rem;font-weight:500;border:1.5px solid #e8eaf0;color:#374151;padding:.4rem .9rem;border-radius:.5rem;text-decoration:none;">← Back</a>
+        <?php endif; ?>
     </div>
+    <?php if (isset($message)): ?><div class="alert alert-success alert-dismissible fade show py-2 px-3 small"><?= e($message) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div><?php endif; ?>
+
+    <?php if ($action === 'list'): ?>
+        <?php if (count($certs) > 0): ?>
+            <div style="display:flex;flex-direction:column;gap:.75rem;">
+            <?php foreach ($certs as $c): ?>
+                <div style="padding:1rem 1.25rem;border:1px solid #e8eaf0;border-radius:.6rem;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;">
+                    <div>
+                        <div style="font-weight:600;color:#111827;font-size:.9rem;"><?= e($c['title']) ?></div>
+                        <?php if ($c['issuer']): ?><div style="font-size:.8rem;color:#6b7280;margin:.15rem 0;">Issued by: <?= e($c['issuer']) ?></div><?php endif; ?>
+                        <?php if ($c['issue_date']): ?><div style="font-size:.75rem;color:#9ca3af;"><?= e(date('M Y', strtotime($c['issue_date']))) ?></div><?php endif; ?>
+                    </div>
+                    <div style="display:flex;gap:.4rem;flex-shrink:0;">
+                        <a href="?action=edit&id=<?= e($c['id']) ?>" style="font-size:.75rem;border:1.5px solid #e8eaf0;color:#374151;padding:.3rem .65rem;border-radius:.45rem;text-decoration:none;">Edit</a>
+                        <a href="?delete=<?= e($c['id']) ?>" onclick="return confirm('Delete?')" style="font-size:.75rem;background:#fee2e2;color:#ef4444;padding:.3rem .65rem;border-radius:.45rem;text-decoration:none;">Delete</a>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <div style="text-align:center;padding:3rem 1rem;color:#9ca3af;"><i class="bi bi-award" style="font-size:2.5rem;display:block;margin-bottom:.75rem;color:#d1d5db;"></i>No certifications added yet.</div>
+        <?php endif; ?>
+    <?php else: ?>
+        <form method="post" novalidate>
+            <?= csrf_field() ?>
+            <input type="hidden" name="_action" value="<?= e($action) ?>">
+            <div class="row g-3">
+                <div class="col-12"><label class="form-label">Certification Title *</label><input type="text" class="form-control" name="title" required value="<?= e($cert['title'] ?? '') ?>"></div>
+                <div class="col-12"><label class="form-label">Issuing Organization</label><input type="text" class="form-control" name="issuer" value="<?= e($cert['issuer'] ?? '') ?>"></div>
+                <div class="col-md-6"><label class="form-label">Issue Date</label><input type="date" class="form-control" name="issue_date" value="<?= e($cert['issue_date'] ?? '') ?>"></div>
+                <div class="col-md-6"><label class="form-label">Credential URL</label><input type="url" class="form-control" name="credential_url" value="<?= e($cert['credential_url'] ?? '') ?>"></div>
+            </div>
+            <div class="mt-3" style="display:flex;gap:.5rem;">
+                <button type="submit" style="background:#1349cc;color:#fff;border:none;border-radius:.6rem;padding:.6rem 1.25rem;font-weight:600;cursor:pointer;">Save</button>
+                <a href="?action=list" style="border:1.5px solid #e8eaf0;color:#374151;padding:.55rem 1rem;border-radius:.6rem;text-decoration:none;font-size:.875rem;">Cancel</a>
+            </div>
+        </form>
+    <?php endif; ?>
 </div>
 
-<?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
+<?php require_once dirname(__DIR__) . '/includes/student-layout-end.php'; ?>

@@ -1,8 +1,13 @@
 <?php
-$pageTitle = 'My Skills';
-require_once dirname(__DIR__) . '/includes/header.php';
+$pageTitle   = 'My Skills';
+$currentPage = 'skills';
+require_once dirname(__DIR__) . '/config/config.php';
+require_once dirname(__DIR__) . '/includes/functions.php';
+require_once dirname(__DIR__) . '/includes/csrf.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/config/database.php';
 
+init_session();
 require_role(ROLE_STUDENT);
 
 $userId = current_user_id();
@@ -100,101 +105,67 @@ if (isset($_GET['delete'])) {
 }
 ?>
 
-<div class="container py-4">
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="list-group list-group-flush">
-                    <a href="<?= e(app_url('student/profile.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-person"></i> Basic Info
-                    </a>
-                    <a href="<?= e(app_url('student/education.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-mortarboard"></i> Education
-                    </a>
-                    <a href="<?= e(app_url('student/skills.php')) ?>" class="list-group-item list-group-item-action active">
-                        <i class="bi bi-star"></i> Skills
-                    </a>
-                    <a href="<?= e(app_url('student/projects.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-briefcase"></i> Projects
-                    </a>
-                    <a href="<?= e(app_url('student/certifications.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-award"></i> Certifications
-                    </a>
-                    <a href="<?= e(app_url('student/cvs.php')) ?>" class="list-group-item list-group-item-action">
-                        <i class="bi bi-file-pdf"></i> CVs
-                    </a>
-                </div>
+require_once dirname(__DIR__) . '/includes/student-layout.php';
+?>
+
+<h1 class="page-title">My Skills</h1>
+<p class="page-sub">Add and manage your technical and soft skills</p>
+
+<div class="ds-card p-4">
+
+    <?php if ($message): ?>
+        <div class="alert alert-success alert-dismissible fade show py-2 px-3 small"><?= e($message) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    <?php endif; ?>
+    <?php if ($error): ?>
+        <div class="alert alert-danger alert-dismissible fade show py-2 px-3 small"><?= e($error) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    <?php endif; ?>
+
+    <?php if (count($student_skills) > 0): ?>
+        <div style="margin-bottom:1.5rem;">
+            <div style="font-size:.85rem;font-weight:700;color:#111827;margin-bottom:.75rem;">Your Skills</div>
+            <div style="display:flex;flex-wrap:wrap;gap:.5rem;">
+                <?php foreach ($student_skills as $skillId => $proficiency):
+                    $skillName = null;
+                    foreach ($skills_by_category as $cat => $data)
+                        foreach ($data['skills'] as $skill)
+                            if ($skill['id'] == $skillId) { $skillName = $skill['name']; break 2; }
+                ?>
+                <span style="display:inline-flex;align-items:center;gap:.4rem;font-size:.78rem;background:#eff3ff;color:#1349cc;padding:.3rem .75rem;border-radius:2rem;font-weight:600;">
+                    <?= e($skillName) ?> <span style="opacity:.7;font-weight:400;">(<?= e($proficiency) ?>)</span>
+                    <a href="?delete=<?= e($skillId) ?>" onclick="return confirm('Remove this skill?')" style="color:#ef4444;text-decoration:none;font-weight:700;margin-left:.2rem;">×</a>
+                </span>
+                <?php endforeach; ?>
             </div>
         </div>
+        <hr style="border-color:#e8eaf0;">
+    <?php endif; ?>
 
-        <div class="col-md-9">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0">My Skills</h5>
+    <div style="font-size:.85rem;font-weight:700;color:#111827;margin-bottom:1rem;">Add Skills</div>
+    <div class="row g-3">
+        <?php foreach ($skills_by_category as $cat_key => $category):
+            $parts   = explode(':', $cat_key);
+            $catName = end($parts);
+            $icon    = $category['type'] === 'technical' ? '💻' : '🎯';
+        ?>
+        <div class="col-md-6">
+            <div style="font-size:.8rem;font-weight:600;color:#374151;margin-bottom:.5rem;"><?= $icon ?> <?= e($catName) ?></div>
+            <?php foreach ($category['skills'] as $skill):
+                if (isset($student_skills[$skill['id']])) continue;
+            ?>
+            <form method="post" style="margin-bottom:.35rem;">
+                <?= csrf_field() ?>
+                <input type="hidden" name="_action" value="add">
+                <input type="hidden" name="skill_id" value="<?= e($skill['id']) ?>">
+                <input type="hidden" name="proficiency" value="intermediate">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:.4rem .75rem;border:1px solid #e8eaf0;border-radius:.5rem;background:#fafbff;">
+                    <span style="font-size:.82rem;color:#374151;"><?= e($skill['name']) ?></span>
+                    <button type="submit" style="font-size:.75rem;background:#eff3ff;color:#1349cc;border:none;border-radius:.4rem;padding:.2rem .6rem;font-weight:600;cursor:pointer;">+ Add</button>
                 </div>
-                <div class="card-body">
-                    <?php if ($message): ?>
-                        <div class="alert alert-success alert-dismissible fade show"><?= e($message) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
-                    <?php endif; ?>
-                    <?php if ($error): ?>
-                        <div class="alert alert-danger alert-dismissible fade show"><?= e($error) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
-                    <?php endif; ?>
-
-                    <?php if (count($student_skills) > 0): ?>
-                        <h6 class="mb-3">Your Skills</h6>
-                        <div class="row g-2 mb-4">
-                            <?php foreach ($student_skills as $skillId => $proficiency): ?>
-                                <?php
-                                $skillName = null;
-                                foreach ($skills_by_category as $cat => $data) {
-                                    foreach ($data['skills'] as $skill) {
-                                        if ($skill['id'] == $skillId) {
-                                            $skillName = $skill['name'];
-                                            break 2;
-                                        }
-                                    }
-                                }
-                                ?>
-                                <div class="col-auto">
-                                    <span class="badge bg-primary me-2"><?= e($skillName) ?> <span class="text-capitalize">(<?= e($proficiency) ?>)</span></span>
-                                    <a href="?delete=<?= e($skillId) ?>" class="badge bg-danger text-decoration-none" onclick="return confirm('Remove this skill?')">×</a>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <hr>
-                    <h6 class="mb-3">Add Skills</h6>
-                    <div class="row g-3">
-                        <?php foreach ($skills_by_category as $cat_key => $category): ?>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold"><?= e($category['type'] === 'technical' ? '💻 Technical' : '🎯 Soft') ?> Skills - <?php 
-                                    $parts = explode(':', $cat_key);
-                                    echo e(end($parts));
-                                ?></label>
-                                <div class="btn-group-vertical w-100" role="group">
-                                    <?php foreach ($category['skills'] as $skill): ?>
-                                        <?php if (!isset($student_skills[$skill['id']])): ?>
-                                            <form method="post" class="d-inline">
-                                                <?= csrf_field() ?>
-                                                <input type="hidden" name="_action" value="add">
-                                                <input type="hidden" name="skill_id" value="<?= e($skill['id']) ?>">
-                                                <div class="d-flex gap-2 align-items-center p-2 border">
-                                                    <input type="hidden" name="proficiency" value="intermediate">
-                                                    <span class="flex-grow-1"><?= e($skill['name']) ?></span>
-                                                    <button type="submit" class="btn btn-sm btn-outline-success">Add</button>
-                                                </div>
-                                            </form>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-            </div>
+            </form>
+            <?php endforeach; ?>
         </div>
+        <?php endforeach; ?>
     </div>
 </div>
 
-<?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
+<?php require_once dirname(__DIR__) . '/includes/student-layout-end.php'; ?>
