@@ -162,7 +162,7 @@ $stmt->close();
     <?php if (count($applications) > 0): ?>
         <div class="table-responsive">
             <table class="table table-hover">
-                <thead class="table-light">
+                <thead>
                     <tr>
                         <th>Candidate</th>
                         <th>Internship</th>

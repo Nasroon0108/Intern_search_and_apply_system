@@ -53,15 +53,17 @@ function initThemeToggle() {
             var next;
 
             if (isPortal && contentEl) {
-                var isDark = contentEl.getAttribute('data-bs-theme') === 'dark';
+                var isDark = root.getAttribute('data-bs-theme') === 'dark';
                 next = isDark ? 'light' : 'dark';
 
                 if (next === 'dark') {
-                    contentEl.setAttribute('data-bs-theme', 'dark');
+                    root.setAttribute('data-bs-theme', 'dark');
                     root.classList.add('ic-content-dark');
-                } else {
                     contentEl.removeAttribute('data-bs-theme');
+                } else {
+                    root.removeAttribute('data-bs-theme');
                     root.classList.remove('ic-content-dark');
+                    contentEl.removeAttribute('data-bs-theme');
                 }
             } else {
                 var isDarkRoot = root.getAttribute('data-bs-theme') === 'dark';

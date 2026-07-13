@@ -101,7 +101,7 @@ $stmt->close();
     <div class="row g-4">
         <div class="col-lg-8">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
+                <div class="card-header border-bottom">
                     <h5 class="mb-0">Company Information</h5>
                 </div>
                 <div class="card-body">
@@ -169,7 +169,7 @@ $stmt->close();
 
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
+                <div class="card-header border-bottom">
                     <h5 class="mb-0">Statistics</h5>
                 </div>
                 <div class="card-body">
@@ -187,7 +187,7 @@ $stmt->close();
             </div>
 
             <div class="card border-0 shadow-sm mt-4">
-                <div class="card-header bg-white border-bottom">
+                <div class="card-header border-bottom">
                     <h5 class="mb-0">Recent Internships</h5>
                 </div>
                 <div class="card-body">

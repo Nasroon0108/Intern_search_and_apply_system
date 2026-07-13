@@ -140,7 +140,7 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
     <?php if (count($internships) > 0): ?>
         <div class="table-responsive">
             <table class="table table-hover">
-                <thead class="table-light">
+                <thead>
                     <tr>
                         <th>Title</th>
                         <th>Vacancies</th>

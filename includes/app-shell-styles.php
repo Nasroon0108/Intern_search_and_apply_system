@@ -1,4 +1,61 @@
 <style>
+/* ── CSS custom properties (light / dark) ── */
+:root {
+    --ic-primary:       #1349cc;
+    --ic-primary-light: #eff3ff;
+    --ic-bg:            #f3f4f8;
+    --ic-surface:       #ffffff;
+    --ic-border:        #e8eaf0;
+    --ic-text:          #111827;
+    --ic-text-muted:    #6b7280;
+    --ic-text-light:    #9ca3af;
+}
+[data-bs-theme="dark"], .ic-content-dark {
+    --ic-primary:       #4f7ef8;
+    --ic-primary-light: #1e2a4a;
+    --ic-bg:            #111827;
+    --ic-surface:       #1f2937;
+    --ic-border:        #374151;
+    --ic-text:          #f9fafb;
+    --ic-text-muted:    #9ca3af;
+    --ic-text-light:    #6b7280;
+}
+
+/* ── IC card / stat helpers ── */
+.ic-card { background: var(--ic-surface); border: 1px solid var(--ic-border); border-radius: .75rem; margin-bottom: 1rem; }
+.ic-card-header {
+    padding: .9rem 1.25rem; font-size: .85rem; font-weight: 700; color: var(--ic-text);
+    border-bottom: 1px solid var(--ic-border);
+}
+.ic-card-body { padding: 1.25rem; }
+.ic-stat-card {
+    background: var(--ic-surface); border: 1px solid var(--ic-border); border-radius: .75rem;
+    padding: 1.25rem; text-align: center;
+}
+.ic-stat-card .stat-value { font-size: 2rem; font-weight: 800; color: var(--ic-primary); line-height: 1; margin-bottom: .3rem; }
+.ic-stat-card .stat-label { font-size: .78rem; color: var(--ic-text-muted); }
+.ic-page-header h1 { font-size: 1.5rem; font-weight: 800; color: var(--ic-text); margin-bottom: .2rem; }
+.ic-page-header p  { font-size: .875rem; color: var(--ic-text-muted); margin: 0; }
+
+/* ── Theme toggle button ── */
+.theme-toggle {
+    background: none; border: 1.5px solid var(--ic-border); border-radius: .5rem;
+    padding: .3rem .55rem; color: var(--ic-text-muted); cursor: pointer; font-size: 1rem;
+    display: flex; align-items: center;
+}
+.theme-toggle:hover { border-color: var(--ic-primary); color: var(--ic-primary); }
+.theme-icon-light { display: none; }
+[data-bs-theme="dark"] .theme-icon-dark  { display: none; }
+[data-bs-theme="dark"] .theme-icon-light { display: inline; }
+
+/* ── Footer links ── */
+.ds-footer span, .ds-footer a { font-size: .75rem; color: var(--ic-text-light); text-decoration: none; }
+.ds-footer a:hover { color: var(--ic-text); }
+.ds-footer-links { display: flex; gap: 1.25rem; }
+
+/* ── Portal flash ── */
+.portal-flash { padding: 0 2rem .5rem; }
+
 /* Critical app-shell layout (sidebar + topbar) — uses CSS variables for dark mode */
 html.ic-app, body.ic-app { height: 100%; margin: 0; background: var(--ic-bg); }
 .ic-app *, .ic-app *::before, .ic-app *::after { box-sizing: border-box; }

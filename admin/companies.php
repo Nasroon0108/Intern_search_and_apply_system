@@ -140,7 +140,7 @@ if (isset($_GET['action'])) {
     <?php if (count($companies) > 0): ?>
         <div class="table-responsive">
             <table class="table table-hover">
-                <thead class="table-light">
+                <thead>
                     <tr>
                         <th>Company Name</th>
                         <th>Email</th>

@@ -145,7 +145,7 @@ $stmt->close();
     <div class="row g-4">
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                <div class="card-header border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Recent Registrations</h5>
                     <a href="<?= e(app_url('admin/users.php')) ?>" class="btn btn-sm btn-outline-primary">View All</a>
                 </div>
@@ -169,7 +169,7 @@ $stmt->close();
 
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                <div class="card-header border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Pending Verifications</h5>
                     <a href="<?= e(app_url('admin/companies.php')) ?>" class="btn btn-sm btn-outline-primary">Manage</a>
                 </div>
@@ -199,7 +199,7 @@ $stmt->close();
     <div class="row g-4 mt-4">
         <div class="col-lg-12">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
+                <div class="card-header border-bottom">
                     <h5 class="mb-0">Quick Actions</h5>
                 </div>
                 <div class="list-group list-group-horizontal list-group-flush">

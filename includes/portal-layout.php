@@ -67,12 +67,11 @@ if ($portalType === 'admin') {
         </div>
     </div>
 
+    <div class="ds-body" id="dsBody">
     <?php if ($flash): ?>
-    <div class="px-4 pt-3">
-        <div class="alert alert-<?= e($flash['type']) ?> alert-dismissible fade show py-2 px-3 small" role="alert">
-            <?= e($flash['message']) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="portal-flash">
+            <div class="alert alert-<?= e($flash['type']) ?> alert-dismissible fade show py-2 px-3 small" role="alert">
+                <?= e($flash['message']) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
         </div>
-    </div>
     <?php endif; ?>
-
-    <div class="ds-body" id="dsBody"><script>(function(){if(localStorage.getItem('ic-theme')==='dark')document.getElementById('dsBody').setAttribute('data-bs-theme','dark');})();</script>

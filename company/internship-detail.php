@@ -132,7 +132,7 @@ $stmt->close();
     <div class="row g-4 mb-4">
         <div class="col-lg-8">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
+                <div class="card-header border-bottom">
                     <h5 class="mb-0">Job Details</h5>
                 </div>
                 <div class="card-body">
@@ -195,7 +195,7 @@ $stmt->close();
 
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
+                <div class="card-header border-bottom">
                     <h5 class="mb-0">Applications</h5>
                 </div>
                 <div class="card-body">
@@ -211,7 +211,7 @@ $stmt->close();
             </div>
 
             <div class="card border-0 shadow-sm mt-4">
-                <div class="card-header bg-white border-bottom">
+                <div class="card-header border-bottom">
                     <h5 class="mb-0">Contact Information</h5>
                 </div>
                 <div class="card-body">
@@ -227,7 +227,7 @@ $stmt->close();
     <div class="row">
         <div class="col-lg-12">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
+                <div class="card-header border-bottom">
                     <h5 class="mb-0">Recent Applications</h5>
                 </div>
                 <div class="card-body">

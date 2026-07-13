@@ -111,7 +111,7 @@ $stmt->close();
     <?php if (count($users) > 0): ?>
         <div class="table-responsive">
             <table class="table table-hover">
-                <thead class="table-light">
+                <thead>
                     <tr>
                         <th>Email</th>
                         <th>Name</th>

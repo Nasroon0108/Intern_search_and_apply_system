@@ -15,8 +15,8 @@ $currentPage = $currentPage ?? '';
         <a href="<?= e(app_url('internships.php')) ?>"          class="<?= ($currentPage==='explore')      ? 'active':'' ?>"><i class="bi bi-compass"></i>              Explore</a>
         <a href="<?= e(app_url('student/applications.php')) ?>" class="<?= ($currentPage==='applications') ? 'active':'' ?>"><i class="bi bi-send"></i>                 Applications</a>
         <a href="<?= e(app_url('student/saved.php')) ?>"        class="<?= ($currentPage==='saved')        ? 'active':'' ?>"><i class="bi bi-bookmark"></i>             Saved</a>
-        <a href="<?= e(app_url('student/profile.php')) ?>"      class="<?= ($currentPage==='profile')      ? 'active':'' ?>"><i class="bi bi-person"></i>               Profile</a>
         <a href="<?= e(app_url('student/skills.php')) ?>"       class="<?= ($currentPage==='skills')       ? 'active':'' ?>"><i class="bi bi-star"></i>                 Skills</a>
         <a href="<?= e(app_url('student/cvs.php')) ?>"          class="<?= ($currentPage==='cvs')          ? 'active':'' ?>"><i class="bi bi-file-earmark-text"></i>    My CVs</a>
+        <a href="<?= e(app_url('student/profile.php')) ?>"      class="<?= ($currentPage==='profile')      ? 'active':'' ?>"><i class="bi bi-person"></i>               Profile</a>
     </nav>
 </aside>
