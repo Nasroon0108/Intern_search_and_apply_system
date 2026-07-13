@@ -15,14 +15,17 @@ $stmt->execute();
 $totalApplications = $stmt->get_result()->fetch_assoc()['total'];
 $stmt->close();
 
+$status1 = 'shortlisted';
+$status2 = 'interview';
 $stmt = $mysqli->prepare('SELECT COUNT(*) as total FROM applications WHERE student_id = ? AND status IN (?, ?)');
-$stmt->bind_param('iss', $student['id'], $status1 = 'shortlisted', $status2 = 'interview');
+$stmt->bind_param('iss', $student['id'], $status1, $status2);
 $stmt->execute();
 $shortlisted = $stmt->get_result()->fetch_assoc()['total'];
 $stmt->close();
 
+$status = 'accepted';
 $stmt = $mysqli->prepare('SELECT COUNT(*) as total FROM applications WHERE student_id = ? AND status = ?');
-$stmt->bind_param('is', $student['id'], $status = 'accepted');
+$stmt->bind_param('is', $student['id'], $status);
 $stmt->execute();
 $accepted = $stmt->get_result()->fetch_assoc()['total'];
 $stmt->close();
