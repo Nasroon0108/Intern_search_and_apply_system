@@ -1,8 +1,14 @@
 <?php
 $pageTitle = 'Manage Users';
-require_once dirname(__DIR__) . '/includes/header.php';
+$currentPage = 'users';
+$portalType = 'admin';
+require_once dirname(__DIR__) . '/config/config.php';
+require_once dirname(__DIR__) . '/includes/functions.php';
+require_once dirname(__DIR__) . '/includes/csrf.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/config/database.php';
 
+init_session();
 require_role(ROLE_ADMIN);
 
 $page = max(1, (int)($_GET['page'] ?? 1));
@@ -66,7 +72,9 @@ $users = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 ?>
 
-<div class="container py-5">
+<?php require_once dirname(__DIR__) . '/includes/portal-layout.php'; ?>
+
+<div>
     <div class="row mb-4">
         <div class="col-md-8">
             <h2>Manage Users</h2>
@@ -185,4 +193,4 @@ $stmt->close();
     <?php endif; ?>
 </div>
 
-<?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
+<?php require_once dirname(__DIR__) . '/includes/portal-layout-end.php'; ?>

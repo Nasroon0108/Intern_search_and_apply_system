@@ -9,7 +9,7 @@ require_once dirname(__DIR__) . '/config/database.php';
 init_session();
 
 if (is_logged_in()) {
-    redirect(app_url('index.php'));
+    redirect(dashboard_url_for_role(current_user_role()));
 }
 
 $error = '';
@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = login_user($mysqli, $email, $password);
     if ($result['success']) {
         set_flash('success', 'Welcome back!');
-        redirect(app_url('index.php'));
+        redirect(dashboard_url_for_role($result['role']));
     }
     $error = $result['error'];
 }
@@ -32,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php require dirname(__DIR__) . '/includes/theme-head.php'; ?>
     <title>Sign In | <?= e(APP_NAME) ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -257,6 +258,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 <div class="auth-wrapper">
+    <div class="theme-toggle-fixed"><?php require dirname(__DIR__) . '/includes/theme-toggle.php'; ?></div>
     <div class="container-fluid p-0 flex-grow-1">
         <div class="row g-0 h-100">
 
@@ -293,6 +295,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </a>
 
                     <div class="or-divider">or sign in with email</div>
+
+                    <div class="alert alert-info py-2 px-3 small mb-3">
+                        <strong>Demo accounts</strong> (password: <code>Demo@123</code>)<br>
+                        <span class="text-muted">Students:</span>
+                        <a href="#" class="demo-login" data-email="amaya.perera@seed.internconnect.lk">Amaya</a> ·
+                        <a href="#" class="demo-login" data-email="kavindu.silva@seed.internconnect.lk">Kavindu</a> ·
+                        <a href="#" class="demo-login" data-email="nethmi.fernando@seed.internconnect.lk">Nethmi</a><br>
+                        <span class="text-muted">Companies:</span>
+                        <a href="#" class="demo-login" data-email="techvista@seed.internconnect.lk">TechVista</a> ·
+                        <a href="#" class="demo-login" data-email="greenwave@seed.internconnect.lk">GreenWave</a>
+                    </div>
 
                     <?php if ($error): ?>
                         <div class="alert alert-danger py-2 px-3 small mb-3"><?= e($error) ?></div>
@@ -360,6 +373,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div><!-- auth-wrapper -->
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="<?= e(asset_url('assets/js/main.js')) ?>"></script>
 <script>
 function togglePw(fieldId, btn) {
     const input = document.getElementById(fieldId);
@@ -372,6 +386,14 @@ function togglePw(fieldId, btn) {
         icon.classList.replace('bi-eye-slash', 'bi-eye');
     }
 }
+
+document.querySelectorAll('.demo-login').forEach(function (link) {
+    link.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.getElementById('email').value = this.dataset.email;
+        document.getElementById('password').value = 'Demo@123';
+    });
+});
 </script>
 </body>
 </html>

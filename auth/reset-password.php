@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$error) {
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-5">
-            <div class="card shadow-sm border-0">
+            <div class="card ic-auth-card">
                 <div class="card-body p-4">
                     <h2 class="h4 mb-1">Reset Password</h2>
                     <p class="text-muted small mb-4">Enter your new password</p>

@@ -1,8 +1,14 @@
 <?php
 $pageTitle = 'Manage Internships';
-require_once dirname(__DIR__) . '/includes/header.php';
+$currentPage = 'internships';
+$portalType = 'company';
+require_once dirname(__DIR__) . '/config/config.php';
+require_once dirname(__DIR__) . '/includes/functions.php';
+require_once dirname(__DIR__) . '/includes/csrf.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/config/database.php';
 
+init_session();
 require_role(ROLE_COMPANY);
 
 $userId = current_user_id();
@@ -96,7 +102,9 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
 }
 ?>
 
-<div class="container py-5">
+<?php require_once dirname(__DIR__) . '/includes/portal-layout.php'; ?>
+
+<div>
     <div class="row mb-4">
         <div class="col-md-8">
             <h2>Manage Internships</h2>
@@ -208,4 +216,4 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
     <?php endif; ?>
 </div>
 
-<?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
+<?php require_once dirname(__DIR__) . '/includes/portal-layout-end.php'; ?>

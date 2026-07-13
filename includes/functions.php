@@ -58,6 +58,14 @@ function app_url(string $path = ''): string
     return rtrim(APP_URL, '/') . '/' . ltrim($path, '/');
 }
 
+function asset_url(string $path): string
+{
+    $fullPath = APP_ROOT . '/' . ltrim($path, '/');
+    $version = file_exists($fullPath) ? (string) filemtime($fullPath) : (string) time();
+
+    return app_url($path) . '?v=' . $version;
+}
+
 function current_user_id(): ?int
 {
     return isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : null;

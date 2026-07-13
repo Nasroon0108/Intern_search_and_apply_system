@@ -1,8 +1,14 @@
 <?php
 $pageTitle = 'Internship Details';
-require_once dirname(__DIR__) . '/includes/header.php';
+$currentPage = 'internships';
+$portalType = 'company';
+require_once dirname(__DIR__) . '/config/config.php';
+require_once dirname(__DIR__) . '/includes/functions.php';
+require_once dirname(__DIR__) . '/includes/csrf.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/config/database.php';
 
+init_session();
 require_role(ROLE_COMPANY);
 
 $userId = current_user_id();
@@ -74,7 +80,9 @@ $recentApplications = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 ?>
 
-<div class="container py-5">
+<?php require_once dirname(__DIR__) . '/includes/portal-layout.php'; ?>
+
+<div>
     <div class="row mb-4">
         <div class="col-md-8">
             <h2><?= e($internship['title']) ?></h2>
@@ -250,4 +258,4 @@ $stmt->close();
     </div>
 </div>
 
-<?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
+<?php require_once dirname(__DIR__) . '/includes/portal-layout-end.php'; ?>

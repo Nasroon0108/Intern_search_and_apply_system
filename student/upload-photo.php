@@ -81,11 +81,11 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
             <?php if ($message): ?><div class="alert alert-success alert-dismissible fade show py-2 px-3 small"><?= e($message) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div><?php endif; ?>
             <?php if ($error):   ?><div class="alert alert-danger  alert-dismissible fade show py-2 px-3 small"><?= e($error)   ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div><?php endif; ?>
 
-            <div style="margin-bottom:1.5rem;">
+            <div class="mb-4">
                 <?php if ($student['profile_photo']): ?>
-                    <img src="<?= e(app_url('uploads/photos/'.$student['profile_photo'])) ?>" alt="Profile" class="rounded-circle" style="width:140px;height:140px;object-fit:cover;border:3px solid #e8eaf0;">
+                    <img src="<?= e(app_url('uploads/photos/'.$student['profile_photo'])) ?>" alt="Profile" class="rounded-circle sp-photo-img" style="width:140px;height:140px;object-fit:cover;">
                 <?php else: ?>
-                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center" style="width:140px;height:140px;background:#eff3ff;color:#1349cc;font-size:3rem;border:3px solid #e8eaf0;">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center sp-photo-placeholder">
                         <i class="bi bi-person"></i>
                     </div>
                 <?php endif; ?>
@@ -96,17 +96,15 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
                 <div class="mb-3 text-start">
                     <label class="form-label">Select Photo (JPG, PNG, WebP)</label>
                     <input type="file" class="form-control" name="photo" accept="image/jpeg,image/png,image/webp" required>
-                    <div class="form-text" style="font-size:.72rem;color:#9ca3af;">Max 2 MB · Square image recommended</div>
+                    <div class="form-text sp-muted">Max 2 MB · Square image recommended</div>
                 </div>
-                <button type="submit" style="width:100%;background:#1349cc;color:#fff;border:none;border-radius:.6rem;padding:.65rem;font-weight:600;cursor:pointer;margin-bottom:.5rem;">Upload Photo</button>
+                <button type="submit" class="sp-btn-primary sp-btn-block">Upload Photo</button>
             </form>
 
             <?php if ($student['profile_photo']): ?>
-                <a href="?delete=1" onclick="return confirm('Delete your profile photo?')"
-                   style="display:block;width:100%;border:1.5px solid #fee2e2;color:#ef4444;border-radius:.6rem;padding:.55rem;font-weight:500;text-decoration:none;margin-bottom:.5rem;">Delete Photo</a>
+                <a href="?delete=1" onclick="return confirm('Delete your profile photo?')" class="sp-btn-danger-block">Delete Photo</a>
             <?php endif; ?>
-            <a href="<?= e(app_url('student/profile.php')) ?>"
-               style="display:block;width:100%;border:1.5px solid #e8eaf0;color:#374151;border-radius:.6rem;padding:.55rem;font-size:.875rem;text-decoration:none;">← Back to Profile</a>
+            <a href="<?= e(app_url('student/profile.php')) ?>" class="sp-btn-outline-block">← Back to Profile</a>
         </div>
     </div>
 </div>

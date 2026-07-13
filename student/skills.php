@@ -120,26 +120,26 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
     <?php endif; ?>
 
     <?php if (count($student_skills) > 0): ?>
-        <div style="margin-bottom:1.5rem;">
-            <div style="font-size:.85rem;font-weight:700;color:#111827;margin-bottom:.75rem;">Your Skills</div>
-            <div style="display:flex;flex-wrap:wrap;gap:.5rem;">
+        <div class="mb-4">
+            <div class="sp-heading-sm">Your Skills</div>
+            <div class="sp-skill-tags">
                 <?php foreach ($student_skills as $skillId => $proficiency):
                     $skillName = null;
                     foreach ($skills_by_category as $cat => $data)
                         foreach ($data['skills'] as $skill)
                             if ($skill['id'] == $skillId) { $skillName = $skill['name']; break 2; }
                 ?>
-                <span style="display:inline-flex;align-items:center;gap:.4rem;font-size:.78rem;background:#eff3ff;color:#1349cc;padding:.3rem .75rem;border-radius:2rem;font-weight:600;">
-                    <?= e($skillName) ?> <span style="opacity:.7;font-weight:400;">(<?= e($proficiency) ?>)</span>
-                    <a href="?delete=<?= e($skillId) ?>" onclick="return confirm('Remove this skill?')" style="color:#ef4444;text-decoration:none;font-weight:700;margin-left:.2rem;">×</a>
+                <span class="sp-skill-tag">
+                    <?= e($skillName) ?> <span class="sp-tag-level">(<?= e($proficiency) ?>)</span>
+                    <a href="?delete=<?= e($skillId) ?>" onclick="return confirm('Remove this skill?')" class="sp-tag-remove">×</a>
                 </span>
                 <?php endforeach; ?>
             </div>
         </div>
-        <hr style="border-color:#e8eaf0;">
+        <hr class="sp-divider">
     <?php endif; ?>
 
-    <div style="font-size:.85rem;font-weight:700;color:#111827;margin-bottom:1rem;">Add Skills</div>
+    <div class="sp-heading-sm mb-3">Add Skills</div>
     <div class="row g-3">
         <?php foreach ($skills_by_category as $cat_key => $category):
             $parts   = explode(':', $cat_key);
@@ -147,18 +147,18 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
             $icon    = $category['type'] === 'technical' ? '💻' : '🎯';
         ?>
         <div class="col-md-6">
-            <div style="font-size:.8rem;font-weight:600;color:#374151;margin-bottom:.5rem;"><?= $icon ?> <?= e($catName) ?></div>
+            <div class="sp-cat-title"><?= $icon ?> <?= e($catName) ?></div>
             <?php foreach ($category['skills'] as $skill):
                 if (isset($student_skills[$skill['id']])) continue;
             ?>
-            <form method="post" style="margin-bottom:.35rem;">
+            <form method="post" class="mb-1">
                 <?= csrf_field() ?>
                 <input type="hidden" name="_action" value="add">
                 <input type="hidden" name="skill_id" value="<?= e($skill['id']) ?>">
                 <input type="hidden" name="proficiency" value="intermediate">
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:.4rem .75rem;border:1px solid #e8eaf0;border-radius:.5rem;background:#fafbff;">
-                    <span style="font-size:.82rem;color:#374151;"><?= e($skill['name']) ?></span>
-                    <button type="submit" style="font-size:.75rem;background:#eff3ff;color:#1349cc;border:none;border-radius:.4rem;padding:.2rem .6rem;font-weight:600;cursor:pointer;">+ Add</button>
+                <div class="sp-skill-row">
+                    <span><?= e($skill['name']) ?></span>
+                    <button type="submit" class="sp-btn-add">+ Add</button>
                 </div>
             </form>
             <?php endforeach; ?>

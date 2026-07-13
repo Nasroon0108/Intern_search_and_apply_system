@@ -1,8 +1,14 @@
 <?php
 $pageTitle = 'Company Details';
-require_once dirname(__DIR__) . '/includes/header.php';
+$currentPage = 'companies';
+$portalType = 'admin';
+require_once dirname(__DIR__) . '/config/config.php';
+require_once dirname(__DIR__) . '/includes/functions.php';
+require_once dirname(__DIR__) . '/includes/csrf.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/config/database.php';
 
+init_session();
 require_role(ROLE_ADMIN);
 
 $companyId = (int)($_GET['id'] ?? 0);
@@ -75,7 +81,9 @@ $company = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 ?>
 
-<div class="container py-5">
+<?php require_once dirname(__DIR__) . '/includes/portal-layout.php'; ?>
+
+<div>
     <div class="row mb-4">
         <div class="col-md-8">
             <h2><?= e($company['company_name']) ?></h2>
@@ -206,4 +214,4 @@ $stmt->close();
     </div>
 </div>
 
-<?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
+<?php require_once dirname(__DIR__) . '/includes/portal-layout-end.php'; ?>

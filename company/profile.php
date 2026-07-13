@@ -1,8 +1,14 @@
 <?php
 $pageTitle = 'Company Profile';
-require_once dirname(__DIR__) . '/includes/header.php';
+$currentPage = 'profile';
+$portalType = 'company';
+require_once dirname(__DIR__) . '/config/config.php';
+require_once dirname(__DIR__) . '/includes/functions.php';
+require_once dirname(__DIR__) . '/includes/csrf.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/config/database.php';
 
+init_session();
 require_role(ROLE_COMPANY);
 
 $userId = current_user_id();
@@ -109,7 +115,9 @@ if (isset($_GET['delete_logo'])) {
 $company = get_company_by_user_id($mysqli, $userId);
 ?>
 
-<div class="container py-5">
+<?php require_once dirname(__DIR__) . '/includes/portal-layout.php'; ?>
+
+<div>
     <div class="row mb-4">
         <div class="col-md-8">
             <h2>Company Profile</h2>
@@ -217,4 +225,4 @@ $company = get_company_by_user_id($mysqli, $userId);
     </div>
 </div>
 
-<?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
+<?php require_once dirname(__DIR__) . '/includes/portal-layout-end.php'; ?>

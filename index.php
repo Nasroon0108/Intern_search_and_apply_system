@@ -14,9 +14,11 @@ require_once __DIR__ . '/includes/header.php';
                 </p>
                 <?php if (!is_logged_in()): ?>
                     <a href="<?= e(app_url('auth/register-student.php')) ?>" class="btn btn-light btn-lg me-2">I'm a Student</a>
-                    <a href="<?= e(app_url('auth/register-company.php')) ?>" class="btn btn-outline-light btn-lg">I'm a Company</a>
+                    <a href="<?= e(app_url('auth/register-company.php')) ?>" class="btn btn-outline-light btn-lg me-2">I'm a Company</a>
+                    <a href="<?= e(app_url('internships.php')) ?>" class="btn btn-outline-light btn-lg">Explore Internships</a>
                 <?php else: ?>
-                    <a href="<?= e(dashboard_url_for_role(current_user_role())) ?>" class="btn btn-light btn-lg">Go to Dashboard</a>
+                    <a href="<?= e(app_url('internships.php')) ?>" class="btn btn-light btn-lg me-2">Explore Internships</a>
+                    <a href="<?= e(dashboard_url_for_role(current_user_role())) ?>" class="btn btn-outline-light btn-lg">Go to Dashboard</a>
                 <?php endif; ?>
             </div>
             <div class="col-lg-5 d-none d-lg-block text-center">

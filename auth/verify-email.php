@@ -21,7 +21,7 @@ if (isset($_GET['token'])) {
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-5">
-            <div class="card shadow-sm border-0">
+            <div class="card ic-auth-card">
                 <div class="card-body p-4 text-center">
                     <?php if ($message): ?>
                         <div class="alert alert-success"><?= e($message) ?></div>

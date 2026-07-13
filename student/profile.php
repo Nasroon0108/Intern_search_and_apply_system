@@ -87,22 +87,20 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
     <div class="col-md-3">
         <div class="ds-card p-4 text-center mb-3">
             <?php if ($student['profile_photo']): ?>
-                <img src="<?= e(app_url('uploads/photos/' . $student['profile_photo'])) ?>" alt="Profile" class="rounded-circle mb-3" style="width:100px;height:100px;object-fit:cover;">
+                <img src="<?= e(app_url('uploads/photos/' . $student['profile_photo'])) ?>" alt="Profile" class="profile-avatar mb-3">
             <?php else: ?>
-                <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:100px;height:100px;background:#eff3ff;color:#1349cc;font-size:2.5rem;">
-                    <i class="bi bi-person"></i>
-                </div>
+                <div class="profile-avatar-placeholder mb-3"><i class="bi bi-person"></i></div>
             <?php endif; ?>
-            <div style="font-weight:700;font-size:.95rem;color:#111827;"><?= e($student['full_name']) ?></div>
-            <div style="font-size:.78rem;color:#9ca3af;margin-bottom:1rem;"><?= e($user['email']) ?></div>
-            <a href="<?= e(app_url('student/upload-photo.php')) ?>" style="font-size:.8rem;font-weight:600;color:#1349cc;background:#eff3ff;padding:.45rem 1rem;border-radius:.5rem;text-decoration:none;display:inline-block;">Upload Photo</a>
-            <hr style="border-color:#e8eaf0;margin:1rem 0;">
-            <div style="text-align:left;">
-                <div style="font-size:.75rem;color:#9ca3af;margin-bottom:.4rem;">Profile Completion</div>
-                <div style="background:#e8eaf0;border-radius:2px;height:8px;overflow:hidden;margin-bottom:.3rem;">
-                    <div style="height:100%;width:<?= e($profileCompletion) ?>%;background:#1349cc;border-radius:2px;"></div>
+            <div class="profile-name"><?= e($student['full_name']) ?></div>
+            <div class="profile-email"><?= e($user['email']) ?></div>
+            <a href="<?= e(app_url('student/upload-photo.php')) ?>" class="btn-upload-photo">Upload Photo</a>
+            <hr class="my-3">
+            <div class="text-start">
+                <div class="small text-muted mb-1">Profile Completion</div>
+                <div class="progress-bar-ic">
+                    <div class="fill" style="width:<?= e($profileCompletion) ?>%;"></div>
                 </div>
-                <div style="font-size:.78rem;font-weight:700;color:#1349cc;"><?= e($profileCompletion) ?>%</div>
+                <div class="small fw-bold text-primary"><?= e($profileCompletion) ?>%</div>
             </div>
         </div>
     </div>
@@ -110,7 +108,7 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
     <!-- Right: form -->
     <div class="col-md-9">
         <div class="ds-card p-4">
-            <div style="font-size:1rem;font-weight:700;color:#111827;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid #e8eaf0;">Basic Information</div>
+            <div class="card-section-title">Basic Information</div>
 
             <?php if ($message): ?>
                 <div class="alert alert-success alert-dismissible fade show py-2 px-3 small"><?= e($message) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
@@ -165,8 +163,10 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
                         <textarea class="form-control" name="bio" rows="4" placeholder="Tell us about yourself..."><?= e($student['bio'] ?? '') ?></textarea>
                     </div>
                 </div>
-                <button type="submit" style="margin-top:1.25rem;background:#1349cc;color:#fff;border:none;border-radius:.6rem;padding:.65rem 1.5rem;font-weight:600;cursor:pointer;">Save Changes</button>
+                <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
             </form>
         </div>
     </div>
 </div>
+
+<?php require_once dirname(__DIR__) . '/includes/student-layout-end.php'; ?>

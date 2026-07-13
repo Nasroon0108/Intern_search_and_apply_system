@@ -48,28 +48,28 @@ $currentPage = 'dashboard';
 $extraHead = <<<'HTML'
 <style>
         .page-hd { margin-bottom: 1.75rem; }
-        .page-hd h1 { font-size: 1.6rem; font-weight: 800; color: #111827; margin-bottom: .2rem; }
-        .page-hd p  { color: #6b7280; font-size: .875rem; margin: 0; }
+        .page-hd h1 { font-size: 1.6rem; font-weight: 800; color: var(--ic-text); margin-bottom: .2rem; }
+        .page-hd p  { color: var(--ic-text-muted); font-size: .875rem; margin: 0; }
         .page-hd .hd-actions { display: flex; gap: .75rem; margin-top: 1rem; flex-wrap: wrap; }
         .btn-export {
-            border: 1.5px solid #d1d5db; background: #fff; border-radius: .55rem;
-            padding: .45rem 1rem; font-size: .825rem; font-weight: 500; color: #374151;
+            border: 1.5px solid var(--ic-border); background: var(--ic-surface); border-radius: .55rem;
+            padding: .45rem 1rem; font-size: .825rem; font-weight: 500; color: var(--ic-text-muted);
             display: flex; align-items: center; gap: .4rem; cursor: pointer;
             text-decoration: none; transition: border-color .2s;
         }
-        .btn-export:hover { border-color: #1349cc; color: #1349cc; }
+        .btn-export:hover { border-color: var(--ic-primary); color: var(--ic-primary); }
         .stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; margin-bottom: 1.5rem; }
         @media(max-width:900px){ .stat-grid { grid-template-columns: repeat(2,1fr); } }
         @media(max-width:540px){ .stat-grid { grid-template-columns: 1fr; } }
         .stat-card {
-            background: #fff; border: 1px solid #e8eaf0; border-radius: .75rem;
+            background: var(--ic-surface); border: 1px solid var(--ic-border); border-radius: .75rem;
             padding: 1.25rem 1.25rem 1rem; position: relative; overflow: hidden;
         }
         .stat-card .sc-label { font-size: .72rem; font-weight: 600; letter-spacing: .07em;
-            text-transform: uppercase; color: #9ca3af; margin-bottom: .5rem; }
-        .stat-card .sc-value { font-size: 1.9rem; font-weight: 800; color: #111827; line-height: 1; margin-bottom: .3rem; }
-        .stat-card .sc-sub   { font-size: .75rem; color: #9ca3af; margin-bottom: .6rem; }
-        .stat-card .sc-bar   { height: 4px; border-radius: 2px; background: #e8eaf0; overflow: hidden; }
+            text-transform: uppercase; color: var(--ic-text-muted); margin-bottom: .5rem; }
+        .stat-card .sc-value { font-size: 1.9rem; font-weight: 800; color: var(--ic-text); line-height: 1; margin-bottom: .3rem; }
+        .stat-card .sc-sub   { font-size: .75rem; color: var(--ic-text-light); margin-bottom: .6rem; }
+        .stat-card .sc-bar   { height: 4px; border-radius: 2px; background: var(--ic-border); overflow: hidden; }
         .stat-card .sc-bar-fill { height: 100%; border-radius: 2px; }
         .stat-card .sc-badge {
             position: absolute; top: 1rem; right: 1rem;
@@ -111,10 +111,10 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
         <div class="stat-grid">
             <!-- Total Applications -->
             <div class="stat-card">
-                <span class="sc-badge" style="background:#eff6ff;color:#1349cc;">
+                <span class="sc-badge sc-badge-blue">
                     +<?= e($totalApplications) ?>
                 </span>
-                <div class="sc-icon" style="background:#eff6ff;color:#1349cc;">
+                <div class="sc-icon sc-icon-blue">
                     <i class="bi bi-send-check"></i>
                 </div>
                 <div class="sc-label">Total Applications</div>
@@ -126,10 +126,10 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
             </div>
             <!-- Shortlisted -->
             <div class="stat-card">
-                <span class="sc-badge" style="background:#f0fdf4;color:#16a34a;">
+                <span class="sc-badge sc-badge-green">
                     <?= $totalApplications > 0 ? round(($shortlisted/$totalApplications)*100) : 0 ?>%
                 </span>
-                <div class="sc-icon" style="background:#f0fdf4;color:#16a34a;">
+                <div class="sc-icon sc-icon-green">
                     <i class="bi bi-trophy"></i>
                 </div>
                 <div class="sc-label">Shortlisted</div>
@@ -141,8 +141,8 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
             </div>
             <!-- Profile Health -->
             <div class="stat-card">
-                <span class="sc-badge" style="background:#f0fdf4;color:#16a34a;">OPTIMAL</span>
-                <div class="sc-icon" style="background:#fff7ed;color:#ea580c;">
+                <span class="sc-badge sc-badge-green">OPTIMAL</span>
+                <div class="sc-icon sc-icon-orange">
                     <i class="bi bi-person-check"></i>
                 </div>
                 <div class="sc-label">Profile Health</div>
@@ -154,8 +154,8 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
             </div>
             <!-- Offers -->
             <div class="stat-card">
-                <span class="sc-badge" style="background:#fef9c3;color:#ca8a04;">Avg</span>
-                <div class="sc-icon" style="background:#fef2f2;color:#ef4444;">
+                <span class="sc-badge sc-badge-amber">Avg</span>
+                <div class="sc-icon sc-icon-red">
                     <i class="bi bi-patch-check"></i>
                 </div>
                 <div class="sc-label">Offers Received</div>
@@ -174,11 +174,11 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
             @media(max-width:900px){ .mid-grid { grid-template-columns: 1fr; } }
 
             .ds-card {
-                background: #fff; border: 1px solid #e8eaf0;
+                background: var(--ic-surface); border: 1px solid var(--ic-border);
                 border-radius: .75rem; padding: 1.5rem;
             }
-            .ds-card .card-title { font-size: 1rem; font-weight: 700; color: #111827; margin-bottom: .2rem; }
-            .ds-card .card-sub   { font-size: .8rem; color: #9ca3af; margin-bottom: 1.25rem; }
+            .ds-card .card-title { font-size: 1rem; font-weight: 700; color: var(--ic-text); margin-bottom: .2rem; }
+            .ds-card .card-sub   { font-size: .8rem; color: var(--ic-text-light); margin-bottom: 1.25rem; }
 
             /* Activity placeholder chart */
             .activity-bars {
@@ -191,28 +191,28 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
                 min-width: 8px;
             }
             .bar-labels { display: flex; justify-content: space-between; margin-top: .5rem; }
-            .bar-labels span { font-size: .7rem; color: #9ca3af; flex: 1; text-align: center; }
+            .bar-labels span { font-size: .7rem; color: var(--ic-text-light); flex: 1; text-align: center; }
 
             /* Profile completion card */
             .profile-ring-wrap { text-align: center; margin-bottom: 1.25rem; }
             .profile-ring {
                 width: 90px; height: 90px; border-radius: 50%;
-                background: conic-gradient(#1349cc <?= $profilePct * 3.6 ?>deg, #e8eaf0 0deg);
+                background: conic-gradient(var(--ic-primary) <?= $profilePct * 3.6 ?>deg, var(--ic-border) 0deg);
                 display: flex; align-items: center; justify-content: center;
                 margin: 0 auto .5rem;
             }
             .profile-ring-inner {
-                width: 68px; height: 68px; background: #fff; border-radius: 50%;
+                width: 68px; height: 68px; background: var(--ic-surface); border-radius: 50%;
                 display: flex; align-items: center; justify-content: center;
-                font-weight: 800; font-size: 1rem; color: #111827;
+                font-weight: 800; font-size: 1rem; color: var(--ic-text);
             }
             .profile-item {
                 display: flex; justify-content: space-between; align-items: center;
-                font-size: .8rem; color: #374151; margin-bottom: .6rem;
+                font-size: .8rem; color: var(--ic-text-muted); margin-bottom: .6rem;
             }
             .profile-item .pi-label { display: flex; align-items: center; gap: .4rem; }
-            .profile-item .pi-pct   { font-weight: 600; color: #1349cc; font-size: .8rem; }
-            .pi-bar { flex: 1; height: 4px; background: #e8eaf0; border-radius: 2px; margin: 0 .75rem; overflow: hidden; }
+            .profile-item .pi-pct   { font-weight: 600; color: var(--ic-primary); font-size: .8rem; }
+            .pi-bar { flex: 1; height: 4px; background: var(--ic-border); border-radius: 2px; margin: 0 .75rem; overflow: hidden; }
             .pi-bar-fill { height: 100%; background: #1349cc; border-radius: 2px; }
         </style>
 
@@ -224,7 +224,7 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
                         <div class="card-title">Application Activity</div>
                         <div class="card-sub">Monthly volume of applications vs. interview invites</div>
                     </div>
-                    <span style="font-size:.75rem;background:#f3f4f8;border-radius:.4rem;padding:.25rem .65rem;color:#374151;font-weight:500;">Last 6 Months</span>
+                    <span style="font-size:.75rem;background:var(--ic-bg);border-radius:.4rem;padding:.25rem .65rem;color:var(--ic-text-muted);font-weight:500;">Last 6 Months</span>
                 </div>
                 <?php
                 // Build 6-month bar data
@@ -261,10 +261,10 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
                     <?php endforeach; ?>
                 </div>
                 <div class="d-flex gap-3 mt-2">
-                    <span style="font-size:.72rem;color:#374151;display:flex;align-items:center;gap:.3rem;">
+                    <span style="font-size:.72rem;color:var(--ic-text-muted);display:flex;align-items:center;gap:.3rem;">
                         <span style="width:10px;height:10px;background:#1349cc;border-radius:2px;display:inline-block;"></span> Applications
                     </span>
-                    <span style="font-size:.72rem;color:#374151;display:flex;align-items:center;gap:.3rem;">
+                    <span style="font-size:.72rem;color:var(--ic-text-muted);display:flex;align-items:center;gap:.3rem;">
                         <span style="width:10px;height:10px;background:#93c5fd;border-radius:2px;display:inline-block;"></span> Interviews
                     </span>
                 </div>
@@ -276,7 +276,7 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
                 <div class="card-sub">Current completion vs. market requirements</div>
                 <div class="profile-ring-wrap">
                     <div class="profile-ring"><div class="profile-ring-inner"><?= e($profilePct) ?>%</div></div>
-                    <div style="font-size:.8rem;color:#6b7280;"><?= $profilePct >= 70 ? 'Looking great!' : 'Needs attention' ?></div>
+                    <div style="font-size:.8rem;color:var(--ic-text-muted);"><?= $profilePct >= 70 ? 'Looking great!' : 'Needs attention' ?></div>
                 </div>
                 <?php
                 $sections = [
@@ -298,7 +298,7 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
                 ?>
                 <?php foreach ($sections as $sec): ?>
                 <div class="profile-item">
-                    <div class="pi-label"><i class="bi <?= e($sec['icon']) ?>" style="color:#6b7280;"></i> <?= e($sec['label']) ?></div>
+                    <div class="pi-label"><i class="bi <?= e($sec['icon']) ?>" style="color:var(--ic-text-muted);"></i> <?= e($sec['label']) ?></div>
                     <div class="pi-bar"><div class="pi-bar-fill" style="width:<?= $sec['pct'] ?>%;"></div></div>
                     <div class="pi-pct"><?= $sec['pct'] ?>%</div>
                 </div>
@@ -310,44 +310,44 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
         <!-- ── Live Application Tracker ── -->
         <style>
             .tracker-card {
-                background: #fff; border: 1px solid #e8eaf0;
+                background: var(--ic-surface); border: 1px solid var(--ic-border);
                 border-radius: .75rem; padding: 1.5rem;
             }
             .tracker-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; flex-wrap: wrap; gap: .75rem; }
-            .tracker-header h2 { font-size: 1rem; font-weight: 700; color: #111827; margin: 0 0 .15rem; }
-            .tracker-header p  { font-size: .8rem; color: #9ca3af; margin: 0; }
+            .tracker-header h2 { font-size: 1rem; font-weight: 700; color: var(--ic-text); margin: 0 0 .15rem; }
+            .tracker-header p  { font-size: .8rem; color: var(--ic-text-light); margin: 0; }
             .tracker-tabs { display: flex; align-items: center; gap: .5rem; }
             .tracker-tabs .ttab {
                 font-size: .78rem; font-weight: 500; padding: .3rem .8rem;
-                border-radius: 2rem; border: 1.5px solid #e8eaf0; background: #fff;
-                cursor: pointer; color: #6b7280; text-decoration: none; transition: all .15s;
+                border-radius: 2rem; border: 1.5px solid var(--ic-border); background: var(--ic-surface);
+                cursor: pointer; color: var(--ic-text-muted); text-decoration: none; transition: all .15s;
             }
             .tracker-tabs .ttab.active,
-            .tracker-tabs .ttab:hover { background: #1349cc; color: #fff; border-color: #1349cc; }
+            .tracker-tabs .ttab:hover { background: var(--ic-primary); color: #fff; border-color: var(--ic-primary); }
             .tracker-tabs .ttab-link {
-                font-size: .78rem; color: #1349cc; text-decoration: none; font-weight: 500;
+                font-size: .78rem; color: var(--ic-primary); text-decoration: none; font-weight: 500;
                 padding: .3rem .6rem;
             }
 
             /* Table */
             .app-table { width: 100%; border-collapse: collapse; }
             .app-table th {
-                font-size: .72rem; font-weight: 600; color: #9ca3af; text-transform: uppercase;
-                letter-spacing: .06em; padding: .6rem .75rem; border-bottom: 1px solid #e8eaf0;
+                font-size: .72rem; font-weight: 600; color: var(--ic-text-light); text-transform: uppercase;
+                letter-spacing: .06em; padding: .6rem .75rem; border-bottom: 1px solid var(--ic-border);
                 text-align: left; white-space: nowrap;
             }
-            .app-table td { padding: 1rem .75rem; border-bottom: 1px solid #f3f4f8; vertical-align: middle; }
+            .app-table td { padding: 1rem .75rem; border-bottom: 1px solid var(--ic-border); vertical-align: middle; color: var(--ic-text); }
             .app-table tr:last-child td { border-bottom: none; }
-            .app-table tr:hover td { background: #fafbff; }
+            .app-table tbody tr:hover td { background: var(--ic-bg); }
 
             .co-avatar {
                 width: 34px; height: 34px; border-radius: .5rem;
-                background: #eff3ff; color: #1349cc; font-weight: 700;
+                background: var(--ic-primary-light); color: var(--ic-primary); font-weight: 700;
                 font-size: .85rem; display: flex; align-items: center; justify-content: center;
                 flex-shrink: 0;
             }
-            .co-name    { font-size: .875rem; font-weight: 600; color: #111827; }
-            .co-sub     { font-size: .75rem; color: #9ca3af; margin-top: .1rem; }
+            .co-name    { font-size: .875rem; font-weight: 600; color: var(--ic-text); }
+            .co-sub     { font-size: .75rem; color: var(--ic-text-light); margin-top: .1rem; }
 
             .status-badge {
                 font-size: .7rem; font-weight: 700; padding: .25rem .65rem;
@@ -360,8 +360,8 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
             .st-accepted   { background: #d1fae5; color: #065f46; }
             .st-rejected   { background: #fee2e2; color: #991b1b; }
 
-            .empty-state { text-align: center; padding: 3rem 1rem; color: #9ca3af; }
-            .empty-state i { font-size: 2.5rem; display: block; margin-bottom: .75rem; color: #d1d5db; }
+            .empty-state { text-align: center; padding: 3rem 1rem; color: var(--ic-text-light); }
+            .empty-state i { font-size: 2.5rem; display: block; margin-bottom: .75rem; color: var(--ic-border); }
         </style>
 
         <div class="tracker-card">
@@ -419,12 +419,12 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
                                 </div>
                             </div>
                         </td>
-                        <td><span style="font-size:.75rem;color:#6b7280;"><?= e($app['work_type'] ?? '—') ?></span></td>
-                        <td><span style="font-size:.78rem;color:#6b7280;"><?= e(date('M j, Y', strtotime($app['applied_at']))) ?></span></td>
+                        <td><span style="font-size:.75rem;color:var(--ic-text-muted);"><?= e($app['work_type'] ?? '—') ?></span></td>
+                        <td><span style="font-size:.78rem;color:var(--ic-text-muted);"><?= e(date('M j, Y', strtotime($app['applied_at']))) ?></span></td>
                         <td><span class="status-badge <?= e($stClass) ?>"><?= e($stLabel) ?></span></td>
                         <td>
                             <a href="<?= e(app_url('student/applications.php')) ?>"
-                               style="color:#9ca3af;font-size:1rem;text-decoration:none;" title="View">
+                               style="color:var(--ic-text-light);font-size:1rem;text-decoration:none;" title="View">
                                 <i class="bi bi-box-arrow-up-right"></i>
                             </a>
                         </td>

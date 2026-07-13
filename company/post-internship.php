@@ -1,8 +1,14 @@
 <?php
 $pageTitle = 'Post Internship';
-require_once dirname(__DIR__) . '/includes/header.php';
+$currentPage = 'post';
+$portalType = 'company';
+require_once dirname(__DIR__) . '/config/config.php';
+require_once dirname(__DIR__) . '/includes/functions.php';
+require_once dirname(__DIR__) . '/includes/csrf.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/config/database.php';
 
+init_session();
 require_role(ROLE_COMPANY);
 
 $userId = current_user_id();
@@ -154,7 +160,9 @@ foreach ($skillsList as $skill) {
 }
 ?>
 
-<div class="container py-5">
+<?php require_once dirname(__DIR__) . '/includes/portal-layout.php'; ?>
+
+<div>
     <div class="row mb-4">
         <div class="col-md-8">
             <h2><?= $isEdit ? 'Edit Internship' : 'Post New Internship' ?></h2>
@@ -263,7 +271,7 @@ foreach ($skillsList as $skill) {
             <div class="row g-3 mb-3">
                 <?php foreach ($skillsByCategory as $category => $skills): ?>
                     <div class="col-md-6">
-                        <div class="card border-0 bg-light">
+                        <div class="card border-0 ic-skill-panel">
                             <div class="card-body">
                                 <h6 class="card-title mb-3"><?= e($category) ?></h6>
                                 <div class="form-check-group">
@@ -303,4 +311,4 @@ foreach ($skillsList as $skill) {
     </form>
 </div>
 
-<?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
+<?php require_once dirname(__DIR__) . '/includes/portal-layout-end.php'; ?>

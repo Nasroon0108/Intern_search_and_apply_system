@@ -83,52 +83,48 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
 <p class="page-sub">Track and manage all your internship applications</p>
 
 <!-- Status filter tabs -->
-<div class="ds-card p-3 mb-4" style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;">
+<div class="ds-card p-3 mb-4 sp-tabs">
     <?php
     $tabs = [
-        'all'         => ['label' => 'All',         'color' => '#1349cc'],
-        'pending'     => ['label' => 'Pending',      'color' => '#b45309'],
-        'shortlisted' => ['label' => 'Shortlisted',  'color' => '#0369a1'],
-        'interview'   => ['label' => 'Interview',    'color' => '#166534'],
-        'accepted'    => ['label' => 'Accepted',     'color' => '#065f46'],
-        'rejected'    => ['label' => 'Rejected',     'color' => '#991b1b'],
+        'all'         => 'All',
+        'pending'     => 'Pending',
+        'shortlisted' => 'Shortlisted',
+        'interview'   => 'Interview',
+        'accepted'    => 'Accepted',
+        'rejected'    => 'Rejected',
     ];
-    foreach ($tabs as $key => $tab):
+    foreach ($tabs as $key => $label):
         $cnt     = $key === 'all' ? $totalAll : ($statusCounts[$key] ?? 0);
         $isActive = $statusFilter === $key;
     ?>
-    <a href="?status=<?= e($key) ?>"
-       style="font-size:.8rem;font-weight:600;padding:.35rem .85rem;border-radius:2rem;text-decoration:none;
-              border:1.5px solid <?= $isActive ? $tab['color'] : '#e8eaf0' ?>;
-              background:<?= $isActive ? $tab['color'] : '#fff' ?>;
-              color:<?= $isActive ? '#fff' : '#6b7280' ?>;">
-        <?= e($tab['label']) ?> <span style="opacity:.8;">(<?= $cnt ?>)</span>
+    <a href="?status=<?= e($key) ?>" class="sp-tab sp-tab--<?= e($key) ?><?= $isActive ? ' active' : '' ?>">
+        <?= e($label) ?> <span style="opacity:.8;">(<?= $cnt ?>)</span>
     </a>
     <?php endforeach; ?>
 </div>
 
 <?php if (count($applications) > 0): ?>
-<div class="ds-card" style="overflow:hidden;">
-    <table style="width:100%;border-collapse:collapse;">
+<div class="ds-card sp-card-overflow">
+    <table class="sp-table" style="width:100%;border-collapse:collapse;">
         <thead>
-            <tr style="background:#f8f9fc;">
-                <th style="padding:.75rem 1.25rem;font-size:.72rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e8eaf0;text-align:left;">Company &amp; Role</th>
-                <th style="padding:.75rem 1rem;font-size:.72rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e8eaf0;">Type</th>
-                <th style="padding:.75rem 1rem;font-size:.72rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e8eaf0;">Applied</th>
-                <th style="padding:.75rem 1rem;font-size:.72rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e8eaf0;">Status</th>
-                <th style="padding:.75rem 1rem;font-size:.72rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #e8eaf0;"></th>
+            <tr>
+                <th style="padding-left:1.25rem;">Company &amp; Role</th>
+                <th>Type</th>
+                <th>Applied</th>
+                <th>Status</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
         <?php foreach ($applications as $app):
             $stClass = match($app['status']) {
-                'pending'     => 'background:#fef9c3;color:#854d0e;',
-                'shortlisted' => 'background:#dbeafe;color:#1d4ed8;',
-                'interview'   => 'background:#dcfce7;color:#166534;',
-                'accepted'    => 'background:#d1fae5;color:#065f46;',
-                'rejected'    => 'background:#fee2e2;color:#991b1b;',
-                'withdrawn'   => 'background:#f3f4f6;color:#6b7280;',
-                default       => 'background:#f3f4f6;color:#6b7280;',
+                'pending'     => 'st-pending',
+                'shortlisted' => 'st-shortlisted',
+                'interview'   => 'st-interview',
+                'accepted'    => 'st-accepted',
+                'rejected'    => 'st-rejected',
+                'withdrawn'   => 'st-withdrawn',
+                default       => 'st-withdrawn',
             };
             $stLabel = match($app['status']) {
                 'pending'     => 'Under Review',
@@ -141,10 +137,10 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
             };
             $co1 = strtoupper(substr($app['company_name'], 0, 1));
         ?>
-        <tr style="border-bottom:1px solid #f3f4f8;" onmouseover="this.style.background='#fafbff'" onmouseout="this.style.background=''">
-            <td style="padding:1rem 1.25rem;">
-                <div style="display:flex;align-items:center;gap:.75rem;">
-                    <div style="width:36px;height:36px;border-radius:.5rem;background:#eff3ff;color:#1349cc;font-weight:700;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <tr>
+            <td style="padding-left:1.25rem;">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="sp-avatar">
                         <?php if ($app['logo']): ?>
                             <img src="<?= e(app_url('uploads/logos/' . $app['logo'])) ?>" style="width:36px;height:36px;object-fit:contain;border-radius:.5rem;" alt="">
                         <?php else: ?>
@@ -152,21 +148,21 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
                         <?php endif; ?>
                     </div>
                     <div>
-                        <div style="font-size:.875rem;font-weight:600;color:#111827;"><?= e($app['company_name']) ?></div>
-                        <div style="font-size:.75rem;color:#9ca3af;"><?= e($app['title']) ?> · <?= e($app['district'] ?? '') ?></div>
+                        <div class="sp-item-title"><?= e($app['company_name']) ?></div>
+                        <div class="sp-muted"><?= e($app['title']) ?> · <?= e($app['district'] ?? '') ?></div>
                     </div>
                 </div>
             </td>
-            <td style="padding:1rem;font-size:.78rem;color:#6b7280;"><?= e($app['work_type'] ?? '—') ?></td>
-            <td style="padding:1rem;font-size:.78rem;color:#6b7280;"><?= e(date('M j, Y', strtotime($app['applied_at']))) ?></td>
-            <td style="padding:1rem;">
-                <span style="font-size:.7rem;font-weight:700;padding:.25rem .65rem;border-radius:.35rem;text-transform:uppercase;letter-spacing:.04em;<?= $stClass ?>"><?= e($stLabel) ?></span>
+            <td><?= e($app['work_type'] ?? '—') ?></td>
+            <td><?= e(date('M j, Y', strtotime($app['applied_at']))) ?></td>
+            <td>
+                <span class="sp-status <?= $stClass ?>"><?= e($stLabel) ?></span>
             </td>
-            <td style="padding:1rem;text-align:right;">
+            <td style="text-align:right;">
                 <?php if ($app['status'] === 'pending'): ?>
                 <a href="?withdraw=<?= e($app['id']) ?>"
                    onclick="return confirm('Withdraw this application?')"
-                   style="font-size:.78rem;color:#ef4444;text-decoration:none;font-weight:500;">Withdraw</a>
+                   class="sp-text-danger">Withdraw</a>
                 <?php endif; ?>
             </td>
         </tr>
@@ -176,26 +172,24 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
 </div>
 
 <?php if ($totalPages > 1): ?>
-<div style="display:flex;justify-content:center;gap:.5rem;margin-top:1.25rem;flex-wrap:wrap;">
+<div class="sp-pager">
     <?php if ($page > 1): ?>
-        <a href="?page=<?= $page-1 ?>&status=<?= e($statusFilter) ?>" style="padding:.4rem .85rem;border:1.5px solid #e8eaf0;border-radius:.5rem;font-size:.8rem;text-decoration:none;color:#374151;">← Prev</a>
+        <a href="?page=<?= $page-1 ?>&status=<?= e($statusFilter) ?>">← Prev</a>
     <?php endif; ?>
     <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-        <a href="?page=<?= $i ?>&status=<?= e($statusFilter) ?>"
-           style="padding:.4rem .85rem;border:1.5px solid <?= $i===$page?'#1349cc':'#e8eaf0' ?>;border-radius:.5rem;font-size:.8rem;text-decoration:none;
-                  background:<?= $i===$page?'#1349cc':'#fff' ?>;color:<?= $i===$page?'#fff':'#374151' ?>;"><?= $i ?></a>
+        <a href="?page=<?= $i ?>&status=<?= e($statusFilter) ?>" class="<?= $i === $page ? 'active' : '' ?>"><?= $i ?></a>
     <?php endfor; ?>
     <?php if ($page < $totalPages): ?>
-        <a href="?page=<?= $page+1 ?>&status=<?= e($statusFilter) ?>" style="padding:.4rem .85rem;border:1.5px solid #e8eaf0;border-radius:.5rem;font-size:.8rem;text-decoration:none;color:#374151;">Next →</a>
+        <a href="?page=<?= $page+1 ?>&status=<?= e($statusFilter) ?>">Next →</a>
     <?php endif; ?>
 </div>
 <?php endif; ?>
 
 <?php else: ?>
-<div class="ds-card" style="text-align:center;padding:4rem 2rem;">
-    <i class="bi bi-send" style="font-size:2.5rem;color:#d1d5db;display:block;margin-bottom:.75rem;"></i>
-    <p style="color:#9ca3af;margin-bottom:.5rem;">No applications <?= $statusFilter !== 'all' ? 'with status "'.e($statusFilter).'"' : 'yet' ?>.</p>
-    <a href="<?= e(app_url('internships.php')) ?>" style="color:#1349cc;font-weight:600;font-size:.875rem;">Browse internships →</a>
+<div class="ds-card sp-empty" style="padding:4rem 2rem;">
+    <i class="bi bi-send"></i>
+    <p style="margin-bottom:.5rem;">No applications <?= $statusFilter !== 'all' ? 'with status "'.e($statusFilter).'"' : 'yet' ?>.</p>
+    <a href="<?= e(app_url('internships.php')) ?>" class="sp-btn-link">Browse internships →</a>
 </div>
 <?php endif; ?>
 

@@ -52,52 +52,50 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
 <p class="page-sub">Internships you've bookmarked for later</p>
 
 <?php if (count($saved) > 0): ?>
-    <div style="display:flex;flex-direction:column;gap:1rem;">
+    <div class="sp-list-stack">
     <?php foreach ($saved as $i): $co1 = strtoupper(substr($i['company_name'], 0, 1)); ?>
-        <div class="ds-card p-4" style="display:flex;align-items:flex-start;gap:1rem;flex-wrap:wrap;">
-            <div style="width:48px;height:48px;border-radius:.6rem;background:#eff3ff;color:#1349cc;font-weight:700;font-size:1.1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <div class="ds-card p-4 sp-stack-row">
+            <div class="sp-avatar sp-avatar-lg">
                 <?php if ($i['logo']): ?>
                     <img src="<?= e(app_url('uploads/logos/'.$i['logo'])) ?>" style="width:48px;height:48px;object-fit:contain;border-radius:.6rem;" alt="">
                 <?php else: ?><?= e($co1) ?><?php endif; ?>
             </div>
-            <div style="flex:1;min-width:0;">
-                <div style="font-size:.95rem;font-weight:700;color:#111827;margin-bottom:.15rem;"><?= e($i['title']) ?></div>
-                <div style="font-size:.8rem;color:#6b7280;margin-bottom:.5rem;"><?= e($i['company_name']) ?> · <?= e($i['district'] ?? '') ?></div>
-                <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.5rem;">
-                    <?php if ($i['work_type']): ?><span style="font-size:.72rem;background:#f3f4f8;color:#374151;padding:.2rem .6rem;border-radius:2rem;"><?= e($i['work_type']) ?></span><?php endif; ?>
-                    <?php if ($i['stipend']): ?><span style="font-size:.72rem;background:#f0fdf4;color:#166534;padding:.2rem .6rem;border-radius:2rem;">Rs. <?= e(number_format($i['stipend'],0)) ?></span><?php endif; ?>
-                    <?php if ($i['duration_months']): ?><span style="font-size:.72rem;background:#eff6ff;color:#1d4ed8;padding:.2rem .6rem;border-radius:2rem;"><?= e($i['duration_months']) ?> months</span><?php endif; ?>
+            <div class="sp-flex-grow">
+                <div class="sp-title-lg"><?= e($i['title']) ?></div>
+                <div class="sp-item-sub"><?= e($i['company_name']) ?> · <?= e($i['district'] ?? '') ?></div>
+                <div class="sp-chip-row">
+                    <?php if ($i['work_type']): ?><span class="sp-chip sp-chip--muted"><?= e($i['work_type']) ?></span><?php endif; ?>
+                    <?php if ($i['stipend']): ?><span class="sp-chip sp-chip--green">Rs. <?= e(number_format($i['stipend'],0)) ?></span><?php endif; ?>
+                    <?php if ($i['duration_months']): ?><span class="sp-chip sp-chip--blue"><?= e($i['duration_months']) ?> months</span><?php endif; ?>
                 </div>
-                <div style="font-size:.75rem;color:#9ca3af;">
+                <div class="sp-muted">
                     Saved: <?= e(date('M j, Y', strtotime($i['saved_at']))) ?>
                     <?php if ($i['application_deadline']): ?> · Deadline: <?= e(date('M j, Y', strtotime($i['application_deadline']))) ?><?php endif; ?>
                 </div>
             </div>
-            <div style="display:flex;gap:.5rem;flex-shrink:0;align-items:center;">
-                <a href="<?= e(app_url('internship-detail.php?id='.$i['id'])) ?>"
-                   style="font-size:.8rem;font-weight:600;background:#1349cc;color:#fff;padding:.4rem .9rem;border-radius:.5rem;text-decoration:none;">View</a>
-                <a href="?unsave=<?= e($i['id']) ?>" onclick="return confirm('Remove from saved?')"
-                   style="font-size:.8rem;font-weight:500;border:1.5px solid #fee2e2;color:#ef4444;padding:.4rem .75rem;border-radius:.5rem;text-decoration:none;">Remove</a>
+            <div class="sp-action-row">
+                <a href="<?= e(app_url('internship-detail.php?id='.$i['id'])) ?>" class="sp-btn-primary">View</a>
+                <a href="?unsave=<?= e($i['id']) ?>" onclick="return confirm('Remove from saved?')" class="sp-btn-remove">Remove</a>
             </div>
         </div>
     <?php endforeach; ?>
     </div>
 
     <?php if ($totalPages > 1): ?>
-    <div style="display:flex;justify-content:center;gap:.5rem;margin-top:1.25rem;flex-wrap:wrap;">
-        <?php if ($page > 1): ?><a href="?page=<?= $page-1 ?>" style="padding:.4rem .85rem;border:1.5px solid #e8eaf0;border-radius:.5rem;font-size:.8rem;text-decoration:none;color:#374151;">← Prev</a><?php endif; ?>
+    <div class="sp-pager">
+        <?php if ($page > 1): ?><a href="?page=<?= $page-1 ?>">← Prev</a><?php endif; ?>
         <?php for ($p = 1; $p <= $totalPages; $p++): ?>
-            <a href="?page=<?= $p ?>" style="padding:.4rem .85rem;border:1.5px solid <?= $p===$page?'#1349cc':'#e8eaf0' ?>;border-radius:.5rem;font-size:.8rem;text-decoration:none;background:<?= $p===$page?'#1349cc':'#fff' ?>;color:<?= $p===$page?'#fff':'#374151' ?>;"><?= $p ?></a>
+            <a href="?page=<?= $p ?>" class="<?= $p === $page ? 'active' : '' ?>"><?= $p ?></a>
         <?php endfor; ?>
-        <?php if ($page < $totalPages): ?><a href="?page=<?= $page+1 ?>" style="padding:.4rem .85rem;border:1.5px solid #e8eaf0;border-radius:.5rem;font-size:.8rem;text-decoration:none;color:#374151;">Next →</a><?php endif; ?>
+        <?php if ($page < $totalPages): ?><a href="?page=<?= $page+1 ?>">Next →</a><?php endif; ?>
     </div>
     <?php endif; ?>
 
 <?php else: ?>
-<div class="ds-card" style="text-align:center;padding:4rem 2rem;">
-    <i class="bi bi-bookmark" style="font-size:2.5rem;color:#d1d5db;display:block;margin-bottom:.75rem;"></i>
-    <p style="color:#9ca3af;margin-bottom:.5rem;">You haven't saved any internships yet.</p>
-    <a href="<?= e(app_url('internships.php')) ?>" style="color:#1349cc;font-weight:600;font-size:.875rem;">Browse internships →</a>
+<div class="ds-card sp-empty" style="padding:4rem 2rem;">
+    <i class="bi bi-bookmark"></i>
+    <p style="margin-bottom:.5rem;">You haven't saved any internships yet.</p>
+    <a href="<?= e(app_url('internships.php')) ?>" class="sp-btn-link">Browse internships →</a>
 </div>
 <?php endif; ?>
 

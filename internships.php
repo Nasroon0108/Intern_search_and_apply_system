@@ -107,105 +107,18 @@ $userRole   = current_user_role();
 $isStudent  = $isLoggedIn && $userRole === ROLE_STUDENT;
 $currentPage = 'explore';
 
-$exploreStyles = <<<'CSS'
-        .filter-card { background:#fff;border:1px solid #e8eaf0;border-radius:.75rem;padding:1.25rem; }
-        .filter-card h6 { font-size:.78rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em;margin-bottom:1rem; }
-        .filter-card .form-label { font-size:.78rem;font-weight:500;color:#374151;margin-bottom:.25rem; }
-        .filter-card .form-control, .filter-card .form-select { font-size:.82rem;border-radius:.5rem;border-color:#e8eaf0;padding:.45rem .75rem; }
-        .filter-card .form-control:focus, .filter-card .form-select:focus { border-color:#1349cc;box-shadow:0 0 0 3px rgba(19,73,204,.1); }
-        .intern-card { background:#fff;border:1px solid #e8eaf0;border-radius:.75rem;padding:1.25rem;margin-bottom:.85rem;transition:box-shadow .15s,border-color .15s; }
-        .intern-card:hover { box-shadow:0 4px 16px rgba(0,0,0,.07);border-color:#c7d2fe; }
-        .intern-card .co-logo { width:48px;height:48px;border-radius:.6rem;background:#eff3ff;color:#1349cc;font-weight:700;font-size:1.1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
-        .intern-card .co-logo img { width:100%;height:100%;object-fit:contain;border-radius:.6rem; }
-        .intern-card .title { font-size:.95rem;font-weight:700;color:#111827;margin-bottom:.15rem; }
-        .intern-card .company { font-size:.8rem;color:#6b7280;margin-bottom:.5rem; }
-        .chip { font-size:.7rem;padding:.2rem .6rem;border-radius:2rem;font-weight:500; }
-        .chip-gray  { background:#f3f4f8;color:#374151; }
-        .chip-green { background:#f0fdf4;color:#166534; }
-        .chip-blue  { background:#eff6ff;color:#1d4ed8; }
-        .btn-view { font-size:.8rem;font-weight:600;background:#1349cc;color:#fff;border:none;border-radius:.5rem;padding:.4rem .9rem;text-decoration:none; }
-        .btn-view:hover { background:#1038a8;color:#fff; }
-        .results-header { font-size:.85rem;color:#6b7280;margin-bottom:1rem; }
-        .results-header strong { color:#111827; }
-        .pager { display:flex;justify-content:center;gap:.4rem;margin-top:1.25rem;flex-wrap:wrap; }
-        .pager a { padding:.35rem .8rem;border:1.5px solid #e8eaf0;border-radius:.45rem;font-size:.8rem;text-decoration:none;color:#374151; }
-        .pager a.active { background:#1349cc;border-color:#1349cc;color:#fff; }
-        .pager a:hover:not(.active) { border-color:#1349cc;color:#1349cc; }
-CSS;
-
 if ($isStudent) {
     $student = get_student_by_user_id($mysqli, current_user_id());
-    $extraHead = '<style>' . $exploreStyles . '</style>';
     require_once __DIR__ . '/includes/student-layout.php';
 } else {
+    require_once __DIR__ . '/includes/header.php';
+}
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= e($pageTitle) ?> | <?= e(APP_NAME) ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="<?= e(app_url('assets/css/style.css')) ?>" rel="stylesheet">
-    <style>
-        body { background: #f3f4f8; }
-        .top-nav {
-            background: #fff; border-bottom: 1px solid #e8eaf0;
-            padding: .7rem 2rem; display: flex; align-items: center; gap: 1.5rem;
-            position: sticky; top: 0; z-index: 100;
-        }
-        .top-nav .brand { display:flex;align-items:center;gap:.55rem;text-decoration:none; }
-        .top-nav .brand .brand-icon { width:32px;height:32px;border-radius:8px;background:#1349cc;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.95rem; }
-        .top-nav .brand .brand-name  { font-weight:700;font-size:.95rem;color:#111827; }
-        .top-nav .nav-links { display:flex;gap:1.25rem;margin-left:1.5rem; }
-        .top-nav .nav-links a { font-size:.85rem;color:#6b7280;text-decoration:none;font-weight:500; }
-        .top-nav .nav-links a:hover, .top-nav .nav-links a.active { color:#1349cc; }
-        .top-nav .nav-right { margin-left:auto;display:flex;align-items:center;gap:.75rem; }
-        .btn-nav-outline { border:1.5px solid #d1d5db;background:#fff;color:#374151;border-radius:.5rem;padding:.35rem .85rem;font-size:.82rem;font-weight:500;text-decoration:none; }
-        .btn-nav-outline:hover { border-color:#1349cc;color:#1349cc; }
-        .btn-nav-primary { background:#1349cc;color:#fff;border:none;border-radius:.5rem;padding:.35rem .85rem;font-size:.82rem;font-weight:600;text-decoration:none; }
-        .btn-nav-primary:hover { background:#1038a8;color:#fff; }
-        .page-wrap { max-width:1200px;margin:0 auto;padding:2rem 1.5rem; }
-        <?= $exploreStyles ?>
-    </style>
-</head>
-<body>
 
-<!-- Top nav -->
-<nav class="top-nav">
-    <a href="<?= e(app_url('index.php')) ?>" class="brand">
-        <div class="brand-icon"><i class="bi bi-briefcase-fill"></i></div>
-        <div class="brand-name">InternConnect</div>
-    </a>
-    <div class="nav-links">
-        <a href="<?= e(app_url('index.php')) ?>">Home</a>
-        <a href="<?= e(app_url('internships.php')) ?>" class="active">Explore</a>
-        <?php if ($isLoggedIn): ?>
-            <a href="<?= e(app_url(match($userRole){ 'student'=>'student/dashboard.php','company'=>'company/dashboard.php','admin'=>'admin/dashboard.php',default=>'index.php'})) ?>">Dashboard</a>
-        <?php endif; ?>
-    </div>
-    <div class="nav-right">
-        <?php if ($isLoggedIn): ?>
-            <a href="<?= e(app_url('auth/logout.php')) ?>" class="btn-nav-outline">Logout</a>
-        <?php else: ?>
-            <a href="<?= e(app_url('auth/login.php')) ?>" class="btn-nav-outline">Login</a>
-            <a href="<?= e(app_url('auth/register-student.php')) ?>" class="btn-nav-primary">Register</a>
-        <?php endif; ?>
-    </div>
-</nav>
+<?php if (!$isStudent): ?><div class="container py-4"><?php endif; ?>
 
-<?php if ($flash): ?>
-<div style="background:#fff;padding:.5rem 2rem;border-bottom:1px solid #e8eaf0;">
-    <div class="alert alert-<?= e($flash['type']) ?> alert-dismissible fade show py-2 px-3 small mb-0" role="alert">
-        <?= e($flash['message']) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-</div>
-<?php endif; ?>
-<?php } ?>
-
-<div class="<?= $isStudent ? '' : 'page-wrap' ?>">
-    <div class="row g-4">
+<div>
+    <div class="row g-4 align-items-start">
 
         <!-- Filters -->
         <div class="col-lg-3">
@@ -282,7 +195,8 @@ if ($isStudent) {
                     <div style="display:flex;align-items:flex-start;gap:1rem;">
                         <div class="co-logo">
                             <?php if ($intern['logo']): ?>
-                                <img src="<?= e(app_url('uploads/logos/'.$intern['logo'])) ?>" alt="">
+                                <img src="<?= e(app_url('uploads/logos/' . $intern['logo'])) ?>" alt="<?= e($intern['company_name']) ?>"
+                                     onerror="this.style.display='none';this.parentElement.textContent='<?= e($co1) ?>';">
                             <?php else: ?><?= e($co1) ?><?php endif; ?>
                         </div>
                         <div style="flex:1;min-width:0;">
@@ -325,10 +239,10 @@ if ($isStudent) {
                 <?php endif; ?>
 
             <?php else: ?>
-                <div style="text-align:center;padding:4rem 2rem;background:#fff;border:1px solid #e8eaf0;border-radius:.75rem;">
-                    <i class="bi bi-search" style="font-size:2.5rem;color:#d1d5db;display:block;margin-bottom:.75rem;"></i>
-                    <p style="color:#9ca3af;margin-bottom:.5rem;">No internships found. Try adjusting your filters.</p>
-                    <a href="<?= e(app_url('internships.php')) ?>" style="color:#1349cc;font-size:.875rem;font-weight:600;">Clear filters →</a>
+                <div class="ic-empty">
+                    <i class="bi bi-search"></i>
+                    <p>No internships found. Try adjusting your filters.</p>
+                    <a href="<?= e(app_url('internships.php')) ?>" class="btn-view">Clear filters</a>
                 </div>
             <?php endif; ?>
         </div>
@@ -339,16 +253,6 @@ if ($isStudent) {
 <?php if ($isStudent): ?>
 <?php require_once __DIR__ . '/includes/student-layout-end.php'; ?>
 <?php else: ?>
-<footer style="background:#fff;border-top:1px solid #e8eaf0;padding:.9rem 2rem;margin-top:2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;">
-    <span style="font-size:.75rem;color:#9ca3af;">&copy; <?= date('Y') ?> <?= e(APP_NAME) ?>. All rights reserved.</span>
-    <div style="display:flex;gap:1.25rem;">
-        <a href="#" style="font-size:.75rem;color:#9ca3af;text-decoration:none;">Privacy Policy</a>
-        <a href="#" style="font-size:.75rem;color:#9ca3af;text-decoration:none;">Support</a>
-    </div>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="<?= e(app_url('assets/js/main.js')) ?>"></script>
-</body>
-</html>
+</div><!-- container -->
+<?php require_once __DIR__ . '/includes/footer.php'; ?>
 <?php endif; ?>

@@ -91,12 +91,12 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
 <p class="page-sub">Add your academic qualifications and degrees</p>
 
 <div class="ds-card p-4">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
-        <div style="font-size:.9rem;font-weight:700;color:#111827;">Education Records</div>
+    <div class="sp-card-header">
+        <div class="sp-heading" style="margin-bottom:0;">Education Records</div>
         <?php if ($action === 'list'): ?>
-            <a href="?action=add" style="font-size:.8rem;font-weight:600;background:#1349cc;color:#fff;padding:.4rem .9rem;border-radius:.5rem;text-decoration:none;"><i class="bi bi-plus-lg"></i> Add Education</a>
+            <a href="?action=add" class="sp-btn-primary"><i class="bi bi-plus-lg"></i> Add Education</a>
         <?php else: ?>
-            <a href="?action=list" style="font-size:.8rem;font-weight:500;border:1.5px solid #e8eaf0;color:#374151;padding:.4rem .9rem;border-radius:.5rem;text-decoration:none;">← Back</a>
+            <a href="?action=list" class="sp-btn-outline">← Back</a>
         <?php endif; ?>
     </div>
 
@@ -105,24 +105,24 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
 
     <?php if ($action === 'list'): ?>
         <?php if (count($educations) > 0): ?>
-            <div style="display:flex;flex-direction:column;gap:.75rem;">
+            <div class="sp-list-stack">
             <?php foreach ($educations as $edu): ?>
-                <div style="padding:1rem 1.25rem;border:1px solid #e8eaf0;border-radius:.6rem;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;">
+                <div class="sp-record-row">
                     <div>
-                        <div style="font-weight:600;color:#111827;font-size:.9rem;"><?= e($edu['degree']) ?></div>
-                        <div style="font-size:.8rem;color:#6b7280;margin:.15rem 0;"><?= e($edu['institution']) ?></div>
-                        <?php if ($edu['field_of_study']): ?><div style="font-size:.75rem;color:#9ca3af;"><?= e($edu['field_of_study']) ?></div><?php endif; ?>
-                        <?php if ($edu['start_year'] || $edu['end_year']): ?><div style="font-size:.75rem;color:#9ca3af;"><?= e($edu['start_year'] ?? '') ?> – <?= e($edu['end_year'] ?? 'Present') ?></div><?php endif; ?>
+                        <div class="sp-item-title"><?= e($edu['degree']) ?></div>
+                        <div class="sp-item-sub"><?= e($edu['institution']) ?></div>
+                        <?php if ($edu['field_of_study']): ?><div class="sp-muted"><?= e($edu['field_of_study']) ?></div><?php endif; ?>
+                        <?php if ($edu['start_year'] || $edu['end_year']): ?><div class="sp-muted"><?= e($edu['start_year'] ?? '') ?> – <?= e($edu['end_year'] ?? 'Present') ?></div><?php endif; ?>
                     </div>
-                    <div style="display:flex;gap:.4rem;flex-shrink:0;">
-                        <a href="?action=edit&id=<?= e($edu['id']) ?>" style="font-size:.75rem;border:1.5px solid #e8eaf0;color:#374151;padding:.3rem .65rem;border-radius:.45rem;text-decoration:none;">Edit</a>
-                        <a href="?delete=<?= e($edu['id']) ?>" onclick="return confirm('Delete this record?')" style="font-size:.75rem;background:#fee2e2;color:#ef4444;padding:.3rem .65rem;border-radius:.45rem;text-decoration:none;">Delete</a>
+                    <div class="sp-record-actions">
+                        <a href="?action=edit&id=<?= e($edu['id']) ?>" class="sp-btn-outline">Edit</a>
+                        <a href="?delete=<?= e($edu['id']) ?>" onclick="return confirm('Delete this record?')" class="sp-btn-danger">Delete</a>
                     </div>
                 </div>
             <?php endforeach; ?>
             </div>
         <?php else: ?>
-            <div style="text-align:center;padding:3rem 1rem;color:#9ca3af;"><i class="bi bi-mortarboard" style="font-size:2.5rem;display:block;margin-bottom:.75rem;color:#d1d5db;"></i>No education added yet.</div>
+            <div class="sp-empty"><i class="bi bi-mortarboard"></i>No education added yet.</div>
         <?php endif; ?>
     <?php else: ?>
         <form method="post" novalidate>
@@ -137,9 +137,9 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
                 <div class="col-md-6"><label class="form-label">GPA</label><input type="number" class="form-control" name="gpa" min="0" max="4" step="0.01" value="<?= e($education['gpa'] ?? '') ?>"></div>
                 <div class="col-12"><label class="form-label">Description</label><textarea class="form-control" name="description" rows="3"><?= e($education['description'] ?? '') ?></textarea></div>
             </div>
-            <div class="mt-3" style="display:flex;gap:.5rem;">
-                <button type="submit" style="background:#1349cc;color:#fff;border:none;border-radius:.6rem;padding:.6rem 1.25rem;font-weight:600;cursor:pointer;">Save</button>
-                <a href="?action=list" style="border:1.5px solid #e8eaf0;color:#374151;padding:.55rem 1rem;border-radius:.6rem;text-decoration:none;font-size:.875rem;">Cancel</a>
+            <div class="mt-3 sp-form-actions">
+                <button type="submit" class="sp-btn-primary">Save</button>
+                <a href="?action=list" class="sp-btn-outline">Cancel</a>
             </div>
         </form>
     <?php endif; ?>

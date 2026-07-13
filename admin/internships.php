@@ -1,8 +1,14 @@
 <?php
 $pageTitle = 'Moderate Internships';
-require_once dirname(__DIR__) . '/includes/header.php';
+$currentPage = 'internships';
+$portalType = 'admin';
+require_once dirname(__DIR__) . '/config/config.php';
+require_once dirname(__DIR__) . '/includes/functions.php';
+require_once dirname(__DIR__) . '/includes/csrf.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/config/database.php';
 
+init_session();
 require_role(ROLE_ADMIN);
 
 $page = max(1, (int)($_GET['page'] ?? 1));
@@ -97,7 +103,9 @@ if (isset($_GET['action'])) {
 }
 ?>
 
-<div class="container py-5">
+<?php require_once dirname(__DIR__) . '/includes/portal-layout.php'; ?>
+
+<div>
     <div class="row mb-4">
         <div class="col-md-8">
             <h2>Moderate Internships</h2>
@@ -198,4 +206,4 @@ if (isset($_GET['action'])) {
     <?php endif; ?>
 </div>
 
-<?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
+<?php require_once dirname(__DIR__) . '/includes/portal-layout-end.php'; ?>

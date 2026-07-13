@@ -1,8 +1,14 @@
 <?php
 $pageTitle = 'Internship Details';
-require_once dirname(__DIR__) . '/includes/header.php';
+$currentPage = 'internships';
+$portalType = 'admin';
+require_once dirname(__DIR__) . '/config/config.php';
+require_once dirname(__DIR__) . '/includes/functions.php';
+require_once dirname(__DIR__) . '/includes/csrf.php';
+require_once dirname(__DIR__) . '/includes/auth.php';
 require_once dirname(__DIR__) . '/config/database.php';
 
+init_session();
 require_role(ROLE_ADMIN);
 
 $internshipId = (int)($_GET['id'] ?? 0);
@@ -98,7 +104,9 @@ $internship = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 ?>
 
-<div class="container py-5">
+<?php require_once dirname(__DIR__) . '/includes/portal-layout.php'; ?>
+
+<div>
     <div class="row mb-4">
         <div class="col-md-8">
             <h2><?= e($internship['title']) ?></h2>
@@ -267,4 +275,4 @@ $stmt->close();
     </div>
 </div>
 
-<?php require_once dirname(__DIR__) . '/includes/footer.php'; ?>
+<?php require_once dirname(__DIR__) . '/includes/portal-layout-end.php'; ?>

@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php require dirname(__DIR__) . '/includes/theme-head.php'; ?>
     <title>Company Registration | <?= e(APP_NAME) ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -130,6 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 <div class="auth-wrapper">
+    <div class="theme-toggle-fixed"><?php require dirname(__DIR__) . '/includes/theme-toggle.php'; ?></div>
     <div class="container-fluid p-0 flex-grow-1">
         <div class="row g-0 h-100">
 
@@ -310,5 +312,6 @@ function togglePw(fieldId, btn) {
     }
 }
 </script>
+<script src="<?= e(asset_url('assets/js/main.js')) ?>"></script>
 </body>
 </html>

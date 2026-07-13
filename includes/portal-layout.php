@@ -1,10 +1,19 @@
 <?php
 /**
- * Student portal layout — shared sidebar + topbar.
- * Include at the top of each student page AFTER setting $pageTitle and $currentPage.
+ * Company / Admin portal layout.
+ * Requires: $pageTitle, $currentPage, $portalType ('company'|'admin')
+ * Company pages also need $company array.
  */
-$flash    = get_flash();
-$initials = strtoupper(substr($student['full_name'] ?? 'S', 0, 1));
+$flash = get_flash();
+$portalType = $portalType ?? 'company';
+$portalName = $portalType === 'admin'
+    ? 'Administrator'
+    : ($company['company_name'] ?? 'Company');
+$portalSub = $portalType === 'admin' ? 'Admin Panel' : 'Company Account';
+$initials = strtoupper(substr($portalName, 0, 1));
+$profileUrl = $portalType === 'admin'
+    ? app_url('admin/dashboard.php')
+    : app_url('company/profile.php');
 ?>
 <!DOCTYPE html>
 <html lang="en" class="ic-app">
@@ -23,34 +32,33 @@ $initials = strtoupper(substr($student['full_name'] ?? 'S', 0, 1));
 <div class="ds-sidebar-overlay" id="sidebarOverlay"></div>
 <div class="ds-shell">
 
-<?php require_once __DIR__ . '/student-sidebar.php'; ?>
+<?php
+if ($portalType === 'admin') {
+    require_once __DIR__ . '/admin-sidebar.php';
+} else {
+    require_once __DIR__ . '/company-sidebar.php';
+}
+?>
 
 <div class="ds-main">
     <div class="ds-topbar">
         <button type="button" class="ds-menu-btn" id="sidebarToggle" aria-label="Open menu">
             <i class="bi bi-list"></i>
         </button>
-        <?php if (($currentPage ?? '') !== 'explore'): ?>
-        <div class="search-box">
-            <i class="bi bi-search"></i>
-            <input type="text" placeholder="Search internships, companies…"
-                   onkeydown="if(event.key==='Enter'){window.location='<?= e(app_url('internships.php')) ?>?keyword='+encodeURIComponent(this.value)}">
-        </div>
-        <?php endif; ?>
+        <div class="topbar-title d-none d-md-block"><?= e($pageTitle) ?></div>
         <div class="topbar-right">
             <?php require __DIR__ . '/theme-toggle.php'; ?>
-            <button class="notif-btn" aria-label="Notifications"><i class="bi bi-bell"></i><span class="notif-dot"></span></button>
-            <a href="<?= e(app_url('student/profile.php')) ?>" class="user-chip" title="My Profile">
+            <a href="<?= e($profileUrl) ?>" class="user-chip" title="Account">
                 <div class="avatar">
-                    <?php if (!empty($student['profile_photo'])): ?>
-                        <img src="<?= e(app_url('uploads/photos/' . $student['profile_photo'])) ?>" alt="Profile">
+                    <?php if ($portalType === 'company' && !empty($company['logo'])): ?>
+                        <img src="<?= e(app_url('uploads/logos/' . $company['logo'])) ?>" alt="Logo">
                     <?php else: ?>
                         <?= e($initials) ?>
                     <?php endif; ?>
                 </div>
                 <div>
-                    <div class="u-name"><?= e($student['full_name'] ?? 'Student') ?></div>
-                    <div class="u-sub"><?= e($student['university'] ?? 'Student') ?></div>
+                    <div class="u-name"><?= e($portalName) ?></div>
+                    <div class="u-sub"><?= e($portalSub) ?></div>
                 </div>
             </a>
             <a href="<?= e(app_url('auth/logout.php')) ?>" class="logout-btn" title="Logout" aria-label="Logout">
