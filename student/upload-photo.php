@@ -13,13 +13,17 @@ require_role(ROLE_STUDENT);
 $userId = current_user_id();
 $student = get_student_by_user_id($mysqli, $userId);
 
+if (!$student) {
+    die('Student profile not found.');
+}
+
 $error = '';
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_valid_csrf();
-    
-    if (!isset($_FILES['photo'])) {
+
+    if (!isset($_FILES['photo']) || ($_FILES['photo']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
         $error = 'No file uploaded.';
     } else {
         $result = handle_file_upload(
@@ -29,21 +33,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             MAX_PHOTO_SIZE,
             'profile_' . $student['id']
         );
-        
+
         if ($result['success']) {
-            // Delete old photo if exists
             if ($student['profile_photo']) {
                 delete_uploaded_file(UPLOAD_PHOTO_PATH, $student['profile_photo']);
             }
-            
-            // Update profile photo
+
             $stmt = $mysqli->prepare('UPDATE students SET profile_photo = ? WHERE id = ?');
-            $stmt->bind_param('si', $result['path'], $student['id']);
-            $stmt->execute();
-            $stmt->close();
-            
-            $message = 'Photo uploaded successfully!';
-            $student['profile_photo'] = $result['path'];
+            if ($stmt) {
+                $stmt->bind_param('si', $result['path'], $student['id']);
+                if ($stmt->execute()) {
+                    $message = 'Photo uploaded successfully!';
+                    $student['profile_photo'] = $result['path'];
+                } else {
+                    $error = 'Failed to save photo to profile.';
+                }
+                $stmt->close();
+            } else {
+                $error = 'Failed to update profile photo.';
+            }
         } else {
             $error = $result['error'];
         }
@@ -60,7 +68,6 @@ if (isset($_GET['delete']) && $student['profile_photo']) {
     $message = 'Photo deleted!';
     $student['profile_photo'] = null;
 }
-?>
 
 require_once dirname(__DIR__) . '/includes/student-layout.php';
 ?>

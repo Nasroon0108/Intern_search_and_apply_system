@@ -68,27 +68,27 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
     $int = $stmt->get_result()->fetch_assoc();
     $stmt->close();
 
-    if ($int && $int['company_id'] === $company['id']) {
+    if ($int && (int)$int['company_id'] === (int)$company['id']) {
         if ($action === 'close') {
             $newStatus = 'closed';
             $stmt = $mysqli->prepare('UPDATE internships SET status = ? WHERE id = ?');
             $stmt->bind_param('si', $newStatus, $id);
             $stmt->execute();
             $stmt->close();
-            flash('success', 'Internship closed.');
+            set_flash('success', 'Internship closed.');
         } elseif ($action === 'activate') {
             $newStatus = 'active';
             $stmt = $mysqli->prepare('UPDATE internships SET status = ? WHERE id = ?');
             $stmt->bind_param('si', $newStatus, $id);
             $stmt->execute();
             $stmt->close();
-            flash('success', 'Internship activated.');
+            set_flash('success', 'Internship activated.');
         } elseif ($action === 'delete') {
             $stmt = $mysqli->prepare('DELETE FROM internships WHERE id = ?');
             $stmt->bind_param('i', $id);
             $stmt->execute();
             $stmt->close();
-            flash('success', 'Internship deleted.');
+            set_flash('success', 'Internship deleted.');
         }
     }
 

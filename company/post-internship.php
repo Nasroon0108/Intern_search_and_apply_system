@@ -30,7 +30,7 @@ if ($internshipId > 0) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    verify_csrf();
+    require_valid_csrf();
 
     $title = trim($_POST['title'] ?? '');
     $category = trim($_POST['category'] ?? '');
@@ -44,16 +44,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $responsibilities = trim($_POST['responsibilities'] ?? '');
     $requirements = trim($_POST['requirements'] ?? '');
     $benefits = trim($_POST['benefits'] ?? '');
-    $contactEmail = trim($_POST['contact_email'] ?? $company['user_email'] ?? '');
+    $contactEmail = trim($_POST['contact_email'] ?? $company['contact_email'] ?? $_SESSION['user_email'] ?? '');
     $contactPhone = trim($_POST['contact_phone'] ?? $company['phone'] ?? '');
     $applicationDeadline = trim($_POST['application_deadline'] ?? '');
+    $applicationDeadline = $applicationDeadline !== '' ? $applicationDeadline : null;
     $skills = $_POST['skills'] ?? [];
 
     // Validate
     if (!$title || !$district || !$province || !$workType || !$vacancies) {
-        flash('error', 'Please fill in all required fields.');
+        set_flash('error', 'Please fill in all required fields.');
     } else {
-        $status = $isEdit ? $internship['status'] : 'pending';
+        $status = $isEdit ? $internship['status'] : 'active';
 
         if ($isEdit) {
             $stmt = $mysqli->prepare(
@@ -84,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
 
             $stmt->bind_param(
-                'isssssiiiisssssss',
+                'issssssiiisssssss',
                 $company['id'], $title, $category, $industry, $district, $province,
                 $workType, $stipend, $durationMonths, $vacancies,
                 $responsibilities, $requirements, $benefits,
@@ -99,10 +100,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->close();
 
             // Handle skills
-            $mysqli->prepare('DELETE FROM internship_skills WHERE internship_id = ?')
-                ->bind_param('i', $internshipId)
-                ->execute()
-                ->close();
+            $delSkills = $mysqli->prepare('DELETE FROM internship_skills WHERE internship_id = ?');
+            if ($delSkills) {
+                $delSkills->bind_param('i', $internshipId);
+                $delSkills->execute();
+                $delSkills->close();
+            }
 
             if (count($skills) > 0) {
                 $stmt = $mysqli->prepare('INSERT INTO internship_skills (internship_id, skill_id) VALUES (?, ?)');
@@ -114,20 +117,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->close();
             }
 
-            flash('success', $isEdit ? 'Internship updated successfully.' : 'Internship posted successfully.');
+            set_flash('success', $isEdit ? 'Internship updated successfully.' : 'Internship posted successfully and is now visible to students.');
             redirect(app_url('company/internships.php'));
         } else {
-            flash('error', 'Failed to save internship.');
+            set_flash('error', 'Failed to save internship.');
         }
     }
 }
 
 // Get skills for form
 $stmt = $mysqli->prepare(
-    'SELECT s.id, sc.category, s.name
+    'SELECT s.id, sc.name AS category, s.name
      FROM skills s
      JOIN skill_categories sc ON sc.id = s.category_id
-     ORDER BY sc.category, s.name'
+     ORDER BY sc.name, s.name'
 );
 $stmt->execute();
 $skillsList = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);

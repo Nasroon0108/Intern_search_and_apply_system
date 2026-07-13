@@ -14,6 +14,8 @@ $flash = get_flash();
 $isLoggedIn = is_logged_in();
 $userRole = current_user_role();
 $userEmail = $_SESSION['user_email'] ?? '';
+$currentScript = basename($_SERVER['SCRIPT_NAME'] ?? '');
+$onDashboardPage = $currentScript === 'dashboard.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -36,15 +38,19 @@ $userEmail = $_SESSION['user_email'] ?? '';
         </button>
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav me-auto">
+                <?php if (basename($_SERVER['SCRIPT_NAME'] ?? '') !== 'index.php'): ?>
                 <li class="nav-item">
                     <a class="nav-link" href="<?= e(app_url('index.php')) ?>">Home</a>
                 </li>
+                <?php endif; ?>
+                <?php if (!$onDashboardPage && $currentScript !== 'index.php'): ?>
                 <?php if ($isLoggedIn && $userRole === ROLE_STUDENT): ?>
                     <li class="nav-item"><a class="nav-link" href="<?= e(app_url('student/dashboard.php')) ?>">Dashboard</a></li>
                 <?php elseif ($isLoggedIn && $userRole === ROLE_COMPANY): ?>
                     <li class="nav-item"><a class="nav-link" href="<?= e(app_url('company/dashboard.php')) ?>">Dashboard</a></li>
                 <?php elseif ($isLoggedIn && $userRole === ROLE_ADMIN): ?>
                     <li class="nav-item"><a class="nav-link" href="<?= e(app_url('admin/dashboard.php')) ?>">Admin</a></li>
+                <?php endif; ?>
                 <?php endif; ?>
             </ul>
             <ul class="navbar-nav">

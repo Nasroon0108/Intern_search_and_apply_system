@@ -9,7 +9,7 @@ require_once dirname(__DIR__) . '/config/database.php';
 init_session();
 
 if (is_logged_in()) {
-    redirect(dashboard_url_for_role(current_user_role()));
+    redirect(app_url('index.php'));
 }
 
 $error = '';
@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = login_user($mysqli, $email, $password);
     if ($result['success']) {
         set_flash('success', 'Welcome back!');
-        redirect(dashboard_url_for_role($result['role']));
+        redirect(app_url('index.php'));
     }
     $error = $result['error'];
 }
@@ -285,12 +285,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <h1 class="auth-title">Welcome Back</h1>
                     <p class="auth-subtitle">Sign in to manage your internships and applications.</p>
 
-                    <!-- Employer / Company quick link -->
+                    <a href="<?= e(app_url('auth/register-student.php')) ?>" class="btn-auth-outline mb-2">
+                        <i class="bi bi-mortarboard"></i> Sign up as Student
+                    </a>
                     <a href="<?= e(app_url('auth/register-company.php')) ?>" class="btn-auth-outline mb-2">
-                        <i class="bi bi-building"></i> Sign in as Employer
+                        <i class="bi bi-building"></i> Sign up as Company
                     </a>
 
-                    <div class="or-divider">or use email</div>
+                    <div class="or-divider">or sign in with email</div>
 
                     <?php if ($error): ?>
                         <div class="alert alert-danger py-2 px-3 small mb-3"><?= e($error) ?></div>
@@ -338,11 +340,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <p class="text-center small mb-0" style="color:#6b7280;">
                         Don't have an account?
                         <a href="<?= e(app_url('auth/register-student.php')) ?>"
-                           class="fw-semibold text-decoration-none" style="color:#1349cc;">Register now</a>
+                           class="fw-semibold text-decoration-none" style="color:#1349cc;">Student sign-up</a>
+                        &nbsp;·&nbsp;
+                        <a href="<?= e(app_url('auth/register-company.php')) ?>"
+                           class="fw-semibold text-decoration-none" style="color:#1349cc;">Company sign-up</a>
                     </p>
 
                     <div class="auth-footer-links">
-                        <a href="<?= e(app_url('auth/register-company.php')) ?>">Employer Login</a>
+                        <a href="<?= e(app_url('auth/forgot-password.php')) ?>">Forgot password</a>
                         <a href="#">Privacy Policy</a>
                         <a href="#">Support</a>
                     </div>

@@ -73,7 +73,6 @@ if ($action !== 'list' && $certId) {
         }
     }
 }
-?>
 
 require_once dirname(__DIR__) . '/includes/student-layout.php';
 ?>

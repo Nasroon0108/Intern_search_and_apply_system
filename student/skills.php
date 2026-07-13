@@ -103,7 +103,6 @@ if (isset($_GET['delete'])) {
     $stmt->close();
     unset($student_skills[$skillId]);
 }
-?>
 
 require_once dirname(__DIR__) . '/includes/student-layout.php';
 ?>

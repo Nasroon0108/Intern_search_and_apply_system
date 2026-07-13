@@ -56,21 +56,6 @@ $initials = strtoupper(substr($student['full_name'] ?? 'S', 0, 1));
         }
         .sb-nav i { font-size: 1rem; }
 
-        /* CTA + footer */
-        .sb-cta {
-            margin: .75rem 1rem 1rem; background: #1349cc; color: #fff; border: none;
-            border-radius: .6rem; padding: .65rem 1rem; font-size: .85rem; font-weight: 600;
-            width: calc(100% - 2rem); display: flex; align-items: center; justify-content: center;
-            gap: .4rem; cursor: pointer; text-decoration: none; transition: background .2s;
-        }
-        .sb-cta:hover { background: #1038a8; color: #fff; }
-        .sb-footer { padding: 1rem 1.25rem; border-top: 1px solid #f0f1f5; }
-        .sb-footer a {
-            display: flex; align-items: center; gap: .6rem;
-            font-size: .825rem; color: #9ca3af; text-decoration: none; padding: .35rem 0;
-        }
-        .sb-footer a:hover { color: #374151; }
-
         /* Topbar */
         .ds-topbar {
             background: #fff; border-bottom: 1px solid #e8eaf0; padding: .75rem 2rem;
@@ -96,9 +81,19 @@ $initials = strtoupper(substr($student['full_name'] ?? 'S', 0, 1));
             width: 36px; height: 36px; border-radius: 50%; background: #1349cc;
             color: #fff; font-weight: 700; font-size: .9rem;
             display: flex; align-items: center; justify-content: center;
+            overflow: hidden; flex-shrink: 0;
+        }
+        .user-chip .avatar img {
+            width: 100%; height: 100%; object-fit: cover;
         }
         .user-chip .u-name { font-size: .85rem; font-weight: 600; line-height: 1.2; }
         .user-chip .u-sub  { font-size: .72rem; color: #9ca3af; }
+        .logout-btn {
+            background: none; border: none; padding: .35rem;
+            color: #9ca3af; font-size: 1.1rem; cursor: pointer;
+            text-decoration: none; display: flex; align-items: center;
+        }
+        .logout-btn:hover { color: #374151; }
 
         /* Page body */
         .ds-body { padding: 2rem; flex: 1; }
@@ -127,48 +122,36 @@ $initials = strtoupper(substr($student['full_name'] ?? 'S', 0, 1));
 <body>
 <div class="ds-shell">
 
-<!-- ── Sidebar ── -->
-<aside class="ds-sidebar">
-    <a href="<?= e(app_url('index.php')) ?>" class="sb-brand">
-        <div class="sb-icon"><i class="bi bi-briefcase-fill"></i></div>
-        <div><div class="sb-name">InternConnect</div><div class="sb-sub">Student Portal</div></div>
-    </a>
-    <nav class="sb-nav">
-        <a href="<?= e(app_url('internships.php')) ?>"           class="<?= ($currentPage==='explore')       ? 'active':'' ?>"><i class="bi bi-compass"></i>              Explore</a>
-        <a href="<?= e(app_url('student/dashboard.php')) ?>"     class="<?= ($currentPage==='dashboard')     ? 'active':'' ?>"><i class="bi bi-grid-1x2"></i>             Dashboard</a>
-        <a href="<?= e(app_url('student/applications.php')) ?>"  class="<?= ($currentPage==='applications')  ? 'active':'' ?>"><i class="bi bi-send"></i>                 Applications</a>
-        <a href="<?= e(app_url('student/saved.php')) ?>"         class="<?= ($currentPage==='saved')         ? 'active':'' ?>"><i class="bi bi-bookmark"></i>             Saved</a>
-        <a href="<?= e(app_url('student/profile.php')) ?>"       class="<?= ($currentPage==='profile')       ? 'active':'' ?>"><i class="bi bi-person"></i>               Profile</a>
-        <a href="<?= e(app_url('student/skills.php')) ?>"        class="<?= ($currentPage==='skills')        ? 'active':'' ?>"><i class="bi bi-star"></i>                 Skills</a>
-        <a href="<?= e(app_url('student/cvs.php')) ?>"           class="<?= ($currentPage==='cvs')           ? 'active':'' ?>"><i class="bi bi-file-earmark-text"></i>    My CVs</a>
-        <a href="<?= e(app_url('student/education.php')) ?>"     class="<?= ($currentPage==='education')     ? 'active':'' ?>"><i class="bi bi-mortarboard"></i>          Education</a>
-        <a href="<?= e(app_url('student/projects.php')) ?>"      class="<?= ($currentPage==='projects')      ? 'active':'' ?>"><i class="bi bi-briefcase"></i>            Projects</a>
-        <a href="<?= e(app_url('student/certifications.php')) ?>" class="<?= ($currentPage==='certifications') ? 'active':'' ?>"><i class="bi bi-award"></i>              Certifications</a>
-    </nav>
-    <a href="<?= e(app_url('internships.php')) ?>" class="sb-cta"><i class="bi bi-plus-lg"></i> New Application</a>
-    <div class="sb-footer">
-        <a href="<?= e(app_url('student/profile.php')) ?>"><i class="bi bi-gear"></i> Settings</a>
-        <a href="<?= e(app_url('auth/logout.php')) ?>"><i class="bi bi-box-arrow-right"></i> Logout</a>
-    </div>
-</aside>
+<?php require_once __DIR__ . '/student-sidebar.php'; ?>
 
 <!-- ── Main ── -->
 <div class="ds-main">
     <!-- Topbar -->
     <div class="ds-topbar">
+        <?php if (($currentPage ?? '') !== 'explore'): ?>
         <div class="search-box">
             <i class="bi bi-search"></i>
             <input type="text" placeholder="Search internships, companies…"
-                   onkeydown="if(event.key==='Enter'){window.location='<?= e(app_url('internships.php')) ?>?q='+encodeURIComponent(this.value)}">
+                   onkeydown="if(event.key==='Enter'){window.location='<?= e(app_url('internships.php')) ?>?keyword='+encodeURIComponent(this.value)}">
         </div>
+        <?php endif; ?>
         <div class="topbar-right">
             <button class="notif-btn" aria-label="Notifications"><i class="bi bi-bell"></i><span class="notif-dot"></span></button>
-            <a href="<?= e(app_url('student/profile.php')) ?>" class="user-chip">
-                <div class="avatar"><?= e($initials) ?></div>
+            <a href="<?= e(app_url('student/profile.php')) ?>" class="user-chip" title="My Profile">
+                <div class="avatar">
+                    <?php if (!empty($student['profile_photo'])): ?>
+                        <img src="<?= e(app_url('uploads/photos/' . $student['profile_photo'])) ?>" alt="Profile">
+                    <?php else: ?>
+                        <?= e($initials) ?>
+                    <?php endif; ?>
+                </div>
                 <div>
                     <div class="u-name"><?= e($student['full_name'] ?? 'Student') ?></div>
                     <div class="u-sub"><?= e($student['university'] ?? 'Student') ?></div>
                 </div>
+            </a>
+            <a href="<?= e(app_url('auth/logout.php')) ?>" class="logout-btn" title="Logout" aria-label="Logout">
+                <i class="bi bi-box-arrow-right"></i>
             </a>
         </div>
     </div>

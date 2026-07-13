@@ -113,6 +113,7 @@ function handle_file_upload(array $file, string $destinationDir, array $allowedM
         'image/jpeg' => 'jpg',
         'image/png' => 'png',
         'image/webp' => 'webp',
+        'image/gif' => 'gif',
         default => 'bin',
     };
 

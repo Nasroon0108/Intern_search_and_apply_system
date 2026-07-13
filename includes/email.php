@@ -5,12 +5,21 @@
 
 function send_email(string $to, string $subject, string $htmlBody): bool
 {
+    if (!MAIL_ENABLED) {
+        return true;
+    }
+
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type: text/html; charset=UTF-8" . "\r\n";
     $headers .= "From: " . APP_NAME . " <noreply@internconnect.lk>" . "\r\n";
     $headers .= "Reply-To: support@internconnect.lk" . "\r\n";
 
-    return mail($to, $subject, $htmlBody, $headers);
+    $sent = @mail($to, $subject, $htmlBody, $headers);
+    if (!$sent) {
+        error_log("Failed to send email to {$to}: {$subject}");
+    }
+
+    return $sent;
 }
 
 function send_verification_email(string $email, string $token): bool

@@ -31,7 +31,8 @@ $stmt = $mysqli->prepare(
 );
 $stmt->bind_param('i', $internshipId);
 $stmt->execute();
-while ($row = $stmt->get_result()->fetch_assoc()) {
+$skillsResult = $stmt->get_result();
+while ($row = $skillsResult->fetch_assoc()) {
     $skills[] = $row['name'];
 }
 $stmt->close();
@@ -45,7 +46,8 @@ $stmt = $mysqli->prepare(
 $stmt->bind_param('i', $internshipId);
 $stmt->execute();
 $applicationStats = [];
-while ($row = $stmt->get_result()->fetch_assoc()) {
+$statsResult = $stmt->get_result();
+while ($row = $statsResult->fetch_assoc()) {
     $applicationStats[$row['status']] = $row['count'];
 }
 $stmt->close();

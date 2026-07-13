@@ -75,7 +75,6 @@ $stmt = $mysqli->prepare('UPDATE students SET profile_completion = ? WHERE id = 
 $stmt->bind_param('ii', $profileCompletion, $student['id']);
 $stmt->execute();
 $stmt->close();
-?>
 
 require_once dirname(__DIR__) . '/includes/student-layout.php';
 ?>

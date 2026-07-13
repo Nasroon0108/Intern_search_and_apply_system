@@ -14,8 +14,8 @@ if (!$company) {
 
 $action = $_GET['action'] ?? 'edit';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    verify_csrf();
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($_POST['_action'] ?? '') !== 'upload_logo')) {
+    require_valid_csrf();
 
     $companyName = trim($_POST['company_name'] ?? '');
     $industry = trim($_POST['industry'] ?? '');
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Validate
     if (!$companyName || !$district || !$province) {
-        flash('error', 'Company name, district, and province are required.');
+        set_flash('error', 'Company name, district, and province are required.');
     } else {
         $stmt = $mysqli->prepare(
             'UPDATE companies 
@@ -45,42 +45,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($stmt->execute()) {
             $stmt->close();
-            flash('success', 'Company profile updated successfully.');
+            set_flash('success', 'Company profile updated successfully.');
             redirect(app_url('company/profile.php'));
         } else {
-            flash('error', 'Failed to update profile.');
+            set_flash('error', 'Failed to update profile.');
         }
     }
 }
 
 // Handle logo upload
 if (isset($_POST['_action']) && $_POST['_action'] === 'upload_logo') {
-    verify_csrf();
+    require_valid_csrf();
 
     if (empty($_FILES['logo']['name'])) {
-        flash('error', 'Please select a logo file.');
+        set_flash('error', 'Please select a logo file.');
     } else {
         $result = handle_file_upload(
             $_FILES['logo'],
             UPLOAD_LOGO_PATH,
             ALLOWED_LOGO_TYPES,
-            MAX_LOGO_SIZE
+            MAX_LOGO_SIZE,
+            'logo_' . $company['id']
         );
 
         if ($result['success']) {
-            // Delete old logo if exists
-            if ($company['logo'] && file_exists(UPLOAD_LOGO_PATH . $company['logo'])) {
-                unlink(UPLOAD_LOGO_PATH . $company['logo']);
+            if ($company['logo']) {
+                delete_uploaded_file(UPLOAD_LOGO_PATH, $company['logo']);
             }
 
             $stmt = $mysqli->prepare('UPDATE companies SET logo = ? WHERE id = ?');
-            $stmt->bind_param('si', $result['filename'], $company['id']);
-            $stmt->execute();
-            $stmt->close();
-
-            flash('success', 'Logo updated successfully.');
+            if ($stmt) {
+                $stmt->bind_param('si', $result['path'], $company['id']);
+                $stmt->execute();
+                $stmt->close();
+                set_flash('success', 'Logo updated successfully.');
+            } else {
+                set_flash('error', 'Failed to save logo to profile.');
+            }
         } else {
-            flash('error', $result['error']);
+            set_flash('error', $result['error']);
         }
 
         redirect(app_url('company/profile.php'));
@@ -89,8 +92,8 @@ if (isset($_POST['_action']) && $_POST['_action'] === 'upload_logo') {
 
 // Handle logo delete
 if (isset($_GET['delete_logo'])) {
-    if ($company['logo'] && file_exists(UPLOAD_LOGO_PATH . $company['logo'])) {
-        unlink(UPLOAD_LOGO_PATH . $company['logo']);
+    if ($company['logo']) {
+        delete_uploaded_file(UPLOAD_LOGO_PATH, $company['logo']);
     }
 
     $stmt = $mysqli->prepare('UPDATE companies SET logo = NULL WHERE id = ?');
@@ -98,7 +101,7 @@ if (isset($_GET['delete_logo'])) {
     $stmt->execute();
     $stmt->close();
 
-    flash('success', 'Logo deleted.');
+    set_flash('success', 'Logo deleted.');
     redirect(app_url('company/profile.php'));
 }
 
@@ -130,7 +133,7 @@ $company = get_company_by_user_id($mysqli, $userId);
                         <?= csrf_field() ?>
                         <input type="hidden" name="_action" value="upload_logo">
                         <div class="mb-2">
-                            <input type="file" class="form-control form-control-sm" name="logo" accept=".jpg,.jpeg,.png,.gif" required>
+                            <input type="file" class="form-control form-control-sm" name="logo" accept="image/jpeg,image/png,image/webp,image/gif" required>
                             <small class="form-text text-muted">JPG, PNG, GIF (Max 2MB)</small>
                         </div>
                         <button type="submit" class="btn btn-sm btn-primary w-100">Upload Logo</button>

@@ -75,7 +75,6 @@ if ($action !== 'list' && $projectId) {
         }
     }
 }
-?>
 
 require_once dirname(__DIR__) . '/includes/student-layout.php';
 ?>

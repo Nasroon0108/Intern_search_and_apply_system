@@ -83,7 +83,6 @@ if ($action !== 'list' && $educationId) {
         }
     }
 }
-?>
 
 require_once dirname(__DIR__) . '/includes/student-layout.php';
 ?>

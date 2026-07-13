@@ -61,11 +61,10 @@ $stmt->close();
 
 // Get recent applications
 $stmt = $mysqli->prepare(
-    'SELECT a.id, a.status, a.applied_at, i.title, s.full_name, c.user_id as app_user_id
+    'SELECT a.id, a.status, a.applied_at, i.title, s.full_name
      FROM applications a
      JOIN internships i ON i.id = a.internship_id
      JOIN students s ON s.id = a.student_id
-     JOIN users c ON c.id = s.user_id
      WHERE i.company_id = ?
      ORDER BY a.applied_at DESC
      LIMIT 5'
@@ -191,7 +190,7 @@ $stmt->close();
                     <?php if (count($recentApplications) > 0): ?>
                         <div class="list-group list-group-sm">
                             <?php foreach ($recentApplications as $app): ?>
-                                <a href="<?= e(app_url('company/application-detail.php?id=' . $app['id'])) ?>" class="list-group-item list-group-item-action list-group-item-sm">
+                                <a href="<?= e(app_url('company/applications.php')) ?>" class="list-group-item list-group-item-action list-group-item-sm">
                                     <div class="d-flex justify-content-between align-items-center small">
                                         <div>
                                             <strong><?= e($app['full_name']) ?></strong><br>

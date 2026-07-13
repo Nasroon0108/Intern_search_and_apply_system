@@ -47,7 +47,7 @@ $offset = ($page - 1) * $perPage;
 
 // Get applications
 $query = "
-    SELECT a.*, i.title, s.full_name, s.student_id, u.email, c.logo
+    SELECT a.*, i.title, s.full_name, u.email, c.logo
     FROM applications a
     JOIN internships i ON i.id = a.internship_id
     JOIN students s ON s.id = a.student_id
@@ -69,7 +69,7 @@ $stmt->close();
 
 // Handle status update
 if (isset($_POST['_action'])) {
-    verify_csrf();
+    require_valid_csrf();
 
     $appId = (int)$_POST['app_id'];
     $newStatus = $_POST['_action'];
@@ -92,7 +92,7 @@ if (isset($_POST['_action'])) {
         $stmt->close();
 
         // TODO: Send email notification to student
-        flash('success', 'Application status updated.');
+        set_flash('success', 'Application status updated.');
     }
 
     redirect(app_url("company/applications.php?status=$statusFilter&internship_id=$internshipFilter"));

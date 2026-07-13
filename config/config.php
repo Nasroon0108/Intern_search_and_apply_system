@@ -7,14 +7,19 @@ define('APP_NAME', 'InternConnect Sri Lanka');
 define('APP_URL', 'http://localhost/Intern_search_and_apply_system');
 define('APP_ROOT', dirname(__DIR__));
 
+// Email — disabled on localhost (XAMPP has no mail server by default)
+define('MAIL_ENABLED', strpos(APP_URL, 'localhost') === false);
+
 // Session
 define('SESSION_LIFETIME', 3600); // 1 hour
 
 // File uploads
 define('MAX_CV_SIZE', 5 * 1024 * 1024);       // 5 MB
 define('MAX_PHOTO_SIZE', 2 * 1024 * 1024);    // 2 MB
+define('MAX_LOGO_SIZE', 2 * 1024 * 1024);     // 2 MB
 define('ALLOWED_CV_TYPES', ['application/pdf']);
 define('ALLOWED_PHOTO_TYPES', ['image/jpeg', 'image/png', 'image/webp']);
+define('ALLOWED_LOGO_TYPES', ['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
 define('UPLOAD_CV_PATH', APP_ROOT . '/uploads/cvs/');
 define('UPLOAD_PHOTO_PATH', APP_ROOT . '/uploads/photos/');

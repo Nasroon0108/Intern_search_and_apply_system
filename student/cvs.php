@@ -93,7 +93,6 @@ $stmt->bind_param('i', $student['id']);
 $stmt->execute();
 $cvs = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
-?>
 
 require_once dirname(__DIR__) . '/includes/student-layout.php';
 ?>
