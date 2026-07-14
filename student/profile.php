@@ -17,7 +17,19 @@ $user = ['email' => $_SESSION['user_email']];
 $error = '';
 $message = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// Delete profile photo from Profile page
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_action'] ?? '') === 'delete_photo') {
+    require_valid_csrf();
+    if (!empty($student['profile_photo'])) {
+        delete_uploaded_file(UPLOAD_PHOTO_PATH, $student['profile_photo']);
+        $stmt = $mysqli->prepare('UPDATE students SET profile_photo = NULL, updated_at = NOW() WHERE id = ?');
+        $stmt->bind_param('i', $student['id']);
+        $stmt->execute();
+        $stmt->close();
+        $student['profile_photo'] = null;
+        $message = 'Profile photo deleted.';
+    }
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_valid_csrf();
     
     $fullName = trim($_POST['full_name'] ?? '');
@@ -82,6 +94,13 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
 <h1 class="page-title">My Profile</h1>
 <p class="page-sub">Manage your personal information and profile details</p>
 
+<?php if ($message): ?>
+    <div class="alert alert-success alert-dismissible fade show py-2 px-3 small mb-3"><?= e($message) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+<?php endif; ?>
+<?php if ($error): ?>
+    <div class="alert alert-danger alert-dismissible fade show py-2 px-3 small mb-3"><?= e($error) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+<?php endif; ?>
+
 <div class="row g-4">
     <!-- Left: photo + completion -->
     <div class="col-md-3">
@@ -93,7 +112,18 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
             <?php endif; ?>
             <div class="profile-name"><?= e($student['full_name']) ?></div>
             <div class="profile-email"><?= e($user['email']) ?></div>
-            <a href="<?= e(app_url('student/upload-photo.php')) ?>" class="btn-upload-photo">Upload Photo</a>
+            <div class="profile-photo-actions">
+                <a href="<?= e(app_url('student/upload-photo.php')) ?>" class="btn-upload-photo">
+                    <?= $student['profile_photo'] ? 'Change Photo' : 'Upload Photo' ?>
+                </a>
+                <?php if ($student['profile_photo']): ?>
+                <form method="post" class="mt-2" onsubmit="return confirm('Delete your profile photo?');">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="_action" value="delete_photo">
+                    <button type="submit" class="btn-delete-photo">Delete Photo</button>
+                </form>
+                <?php endif; ?>
+            </div>
             <hr class="my-3">
             <div class="text-start">
                 <div class="small text-muted mb-1">Profile Completion</div>
@@ -109,13 +139,6 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
     <div class="col-md-9">
         <div class="ds-card p-4">
             <div class="card-section-title">Basic Information</div>
-
-            <?php if ($message): ?>
-                <div class="alert alert-success alert-dismissible fade show py-2 px-3 small"><?= e($message) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
-            <?php endif; ?>
-            <?php if ($error): ?>
-                <div class="alert alert-danger alert-dismissible fade show py-2 px-3 small"><?= e($error) ?><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
-            <?php endif; ?>
 
             <form method="post" novalidate>
                 <?= csrf_field() ?>

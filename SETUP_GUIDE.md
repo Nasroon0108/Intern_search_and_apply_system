@@ -3,14 +3,19 @@
 ## 🎯 5-Minute Quick Start
 
 ```
-1. Place project in: C:\xampp\htdocs\
+1. Place project in: C:\xampp\htdocs\Intern_search_and_apply_system
 2. Start Apache + MySQL (XAMPP Control Panel)
 3. Import database: http://localhost/phpmyadmin → Import → sql/schema.sql
-4. Open: http://localhost/Intern_search_and_apply_system
-5. Login: admin@internconnect.local / admin123
+4. Run admin seed:  /setup/seed_admin.php
+5. Run demo seed:   /setup/seed_data.php
+6. Open: http://localhost/Intern_search_and_apply_system
+7. Login (demo): amaya.perera@seed.internconnect.lk / Demo@123
+   Admin: admin@internconnect.local / Admin123
 ```
 
-**✅ Done!** Your platform is ready.
+**✅ Done!** Your platform is ready with demo data.
+
+> Full friend-friendly guide: see **FRIEND_SETUP.md**
 
 ---
 

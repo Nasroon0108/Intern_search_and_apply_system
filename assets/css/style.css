@@ -1144,6 +1144,33 @@ body.ic-app {
     text-decoration: none;
     display: inline-block;
 }
+.profile-photo-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+}
+.btn-delete-photo {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #ef4444;
+    background: transparent;
+    border: 1.5px solid #fecaca;
+    padding: 0.35rem 0.9rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+.btn-delete-photo:hover {
+    background: #fef2f2;
+    border-color: #ef4444;
+}
+[data-bs-theme="dark"] .btn-delete-photo {
+    color: #fca5a5;
+    border-color: rgba(239, 68, 68, 0.35);
+}
+[data-bs-theme="dark"] .btn-delete-photo:hover {
+    background: rgba(239, 68, 68, 0.15);
+}
 .progress-bar-ic {
     background: var(--ic-border);
     border-radius: 2px;

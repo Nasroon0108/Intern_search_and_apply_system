@@ -59,7 +59,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Handle delete
-if (isset($_GET['delete']) && $student['profile_photo']) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_action'] ?? '') === 'delete_photo') {
+    require_valid_csrf();
+    if (!empty($student['profile_photo'])) {
+        delete_uploaded_file(UPLOAD_PHOTO_PATH, $student['profile_photo']);
+        $stmt = $mysqli->prepare('UPDATE students SET profile_photo = NULL WHERE id = ?');
+        $stmt->bind_param('i', $student['id']);
+        $stmt->execute();
+        $stmt->close();
+        $message = 'Photo deleted!';
+        $student['profile_photo'] = null;
+    }
+} elseif (isset($_GET['delete']) && $student['profile_photo']) {
+    // Legacy GET support — prefer POST form below
     delete_uploaded_file(UPLOAD_PHOTO_PATH, $student['profile_photo']);
     $stmt = $mysqli->prepare('UPDATE students SET profile_photo = NULL WHERE id = ?');
     $stmt->bind_param('i', $student['id']);
@@ -102,7 +114,11 @@ require_once dirname(__DIR__) . '/includes/student-layout.php';
             </form>
 
             <?php if ($student['profile_photo']): ?>
-                <a href="?delete=1" onclick="return confirm('Delete your profile photo?')" class="sp-btn-danger-block">Delete Photo</a>
+                <form method="post" onsubmit="return confirm('Delete your profile photo?');">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="_action" value="delete_photo">
+                    <button type="submit" class="sp-btn-danger-block">Delete Photo</button>
+                </form>
             <?php endif; ?>
             <a href="<?= e(app_url('student/profile.php')) ?>" class="sp-btn-outline-block">← Back to Profile</a>
         </div>

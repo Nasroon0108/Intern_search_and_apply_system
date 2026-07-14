@@ -85,7 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             overflow: hidden;
             flex: 1;
             max-height: 320px;
-            object-fit: cover;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -94,22 +93,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .auth-panel-left .preview-card img {
             width: 100%;
             height: 100%;
+            min-height: 220px;
             object-fit: cover;
-            opacity: .85;
-        }
-
-        .auth-panel-left .preview-placeholder {
-            width: 100%;
-            padding: 3rem 2rem;
-            text-align: center;
-            color: rgba(255,255,255,.7);
-        }
-
-        .auth-panel-left .preview-placeholder i {
-            font-size: 5rem;
+            opacity: .95;
             display: block;
-            margin-bottom: 1rem;
-            color: rgba(255,255,255,.5);
         }
 
         .auth-panel-left .quote {
@@ -270,10 +257,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <p class="brand-tagline">The Official University Internship Portal</p>
 
                 <div class="preview-card">
-                    <div class="preview-placeholder">
-                        <i class="bi bi-people-fill"></i>
-                        <p class="mb-0 fw-semibold" style="color:rgba(255,255,255,.8)">Connect with top companies</p>
-                    </div>
+                    <img src="<?= e(app_url('assets/images/auth-hero.jpg')) ?>"
+                         alt="Students connecting with companies through InternConnect"
+                         loading="lazy">
                 </div>
 
                 <p class="quote mt-4">"Bridging the gap between academic excellence and professional achievement."</p>
