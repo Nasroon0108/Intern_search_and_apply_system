@@ -13,6 +13,11 @@ if (is_logged_in()) {
 }
 
 $error = '';
+$flash = get_flash();
+$devVerifyUrl = $_SESSION['dev_verify_url'] ?? null;
+if ($devVerifyUrl) {
+    unset($_SESSION['dev_verify_url']);
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_valid_csrf();
@@ -282,16 +287,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <div class="or-divider">or sign in with email</div>
 
-                    <div class="alert alert-info py-2 px-3 small mb-3">
-                        <strong>Demo accounts</strong> (password: <code>Demo@123</code>)<br>
-                        <span class="text-muted">Students:</span>
-                        <a href="#" class="demo-login" data-email="amaya.perera@seed.internconnect.lk">Amaya</a> ·
-                        <a href="#" class="demo-login" data-email="kavindu.silva@seed.internconnect.lk">Kavindu</a> ·
-                        <a href="#" class="demo-login" data-email="nethmi.fernando@seed.internconnect.lk">Nethmi</a><br>
-                        <span class="text-muted">Companies:</span>
-                        <a href="#" class="demo-login" data-email="techvista@seed.internconnect.lk">TechVista</a> ·
-                        <a href="#" class="demo-login" data-email="greenwave@seed.internconnect.lk">GreenWave</a>
-                    </div>
+                    <?php if ($flash): ?>
+                        <div class="alert alert-<?= e($flash['type'] === 'error' ? 'danger' : $flash['type']) ?> py-2 px-3 small mb-3"><?= e($flash['message']) ?></div>
+                    <?php endif; ?>
+
+                    <?php if ($devVerifyUrl): ?>
+                        <div class="alert alert-warning py-2 px-3 small mb-3">
+                            <strong>Local development:</strong> click to verify your email:<br>
+                            <a href="<?= e($devVerifyUrl) ?>" class="fw-semibold"><?= e($devVerifyUrl) ?></a>
+                        </div>
+                    <?php endif; ?>
 
                     <?php if ($error): ?>
                         <div class="alert alert-danger py-2 px-3 small mb-3"><?= e($error) ?></div>
@@ -372,14 +377,6 @@ function togglePw(fieldId, btn) {
         icon.classList.replace('bi-eye-slash', 'bi-eye');
     }
 }
-
-document.querySelectorAll('.demo-login').forEach(function (link) {
-    link.addEventListener('click', function (e) {
-        e.preventDefault();
-        document.getElementById('email').value = this.dataset.email;
-        document.getElementById('password').value = 'Demo@123';
-    });
-});
 </script>
 </body>
 </html>

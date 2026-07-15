@@ -83,28 +83,35 @@ if (isset($_GET['action'])) {
 
     if ($company) {
         if ($action === 'verify') {
-            $stmt = $mysqli->prepare('UPDATE companies SET verified = 1 WHERE id = ?');
-            $stmt->bind_param('i', $id);
+            $verificationStatus = 'approved';
+            $stmt = $mysqli->prepare('UPDATE companies SET verified = 1, verification_status = ? WHERE id = ?');
+            $stmt->bind_param('si', $verificationStatus, $id);
             $stmt->execute();
             $stmt->close();
 
             $userId = $company['user_id'];
-            $newStatus = 'active';
-            $stmt = $mysqli->prepare('UPDATE users SET status = ? WHERE id = ?');
+            $newStatus = STATUS_ACTIVE;
+            $stmt = $mysqli->prepare('UPDATE users SET status = ?, email_verified = 1 WHERE id = ?');
             $stmt->bind_param('si', $newStatus, $userId);
             $stmt->execute();
             $stmt->close();
 
-            flash('success', 'Company verified successfully.');
+            set_flash('success', 'Company verified successfully.');
         } elseif ($action === 'reject') {
             $userId = $company['user_id'];
-            $newStatus = 'rejected';
+            $newStatus = STATUS_BLOCKED;
             $stmt = $mysqli->prepare('UPDATE users SET status = ? WHERE id = ?');
             $stmt->bind_param('si', $newStatus, $userId);
             $stmt->execute();
             $stmt->close();
 
-            flash('success', 'Company rejected.');
+            $verificationStatus = 'rejected';
+            $stmt = $mysqli->prepare('UPDATE companies SET verified = 0, verification_status = ? WHERE id = ?');
+            $stmt->bind_param('si', $verificationStatus, $id);
+            $stmt->execute();
+            $stmt->close();
+
+            set_flash('success', 'Company rejected.');
         }
     }
 

@@ -81,21 +81,28 @@ if (isset($_GET['action'])) {
             $stmt->bind_param('si', $newStatus, $id);
             $stmt->execute();
             $stmt->close();
-            flash('success', 'Internship approved.');
+            set_flash('success', 'Internship approved.');
         } elseif ($action === 'reject') {
             $newStatus = 'rejected';
             $stmt = $mysqli->prepare('UPDATE internships SET status = ? WHERE id = ?');
             $stmt->bind_param('si', $newStatus, $id);
             $stmt->execute();
             $stmt->close();
-            flash('success', 'Internship rejected.');
+            set_flash('success', 'Internship rejected.');
         } elseif ($action === 'close') {
             $newStatus = 'closed';
             $stmt = $mysqli->prepare('UPDATE internships SET status = ? WHERE id = ?');
             $stmt->bind_param('si', $newStatus, $id);
             $stmt->execute();
             $stmt->close();
-            flash('success', 'Internship closed.');
+            set_flash('success', 'Internship closed.');
+        } elseif ($action === 'reopen' && in_array($internship['status'], ['closed', 'rejected'], true)) {
+            $newStatus = 'active';
+            $stmt = $mysqli->prepare('UPDATE internships SET status = ? WHERE id = ?');
+            $stmt->bind_param('si', $newStatus, $id);
+            $stmt->execute();
+            $stmt->close();
+            set_flash('success', 'Internship reopened and set to active.');
         }
     }
 
@@ -162,10 +169,12 @@ if (isset($_GET['action'])) {
                                 <div class="btn-group btn-group-sm">
                                     <a href="<?= e(app_url('admin/internship-detail.php?id=' . $int['id'])) ?>" class="btn btn-outline-primary">View</a>
                                     <?php if ($int['status'] === 'pending'): ?>
-                                        <a href="?action=approve&id=<?= e($int['id']) ?>" class="btn btn-outline-success" onclick="return confirm('Approve this internship?')">Approve</a>
-                                        <a href="?action=reject&id=<?= e($int['id']) ?>" class="btn btn-outline-danger" onclick="return confirm('Reject this internship?')">Reject</a>
+                                        <a href="?action=approve&id=<?= e($int['id']) ?>&status=<?= e($statusFilter) ?>" class="btn btn-outline-success" onclick="return confirm('Approve this internship?')">Approve</a>
+                                        <a href="?action=reject&id=<?= e($int['id']) ?>&status=<?= e($statusFilter) ?>" class="btn btn-outline-danger" onclick="return confirm('Reject this internship?')">Reject</a>
                                     <?php elseif ($int['status'] === 'active'): ?>
-                                        <a href="?action=close&id=<?= e($int['id']) ?>" class="btn btn-outline-warning" onclick="return confirm('Close this internship?')">Close</a>
+                                        <a href="?action=close&id=<?= e($int['id']) ?>&status=<?= e($statusFilter) ?>" class="btn btn-outline-warning" onclick="return confirm('Close this internship?')">Close</a>
+                                    <?php elseif (in_array($int['status'], ['closed', 'rejected'], true)): ?>
+                                        <a href="?action=reopen&id=<?= e($int['id']) ?>&status=<?= e($statusFilter) ?>" class="btn btn-outline-success" onclick="return confirm('Reopen this internship and set it to active?')">Reopen</a>
                                     <?php endif; ?>
                                 </div>
                             </td>

@@ -18,7 +18,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_valid_csrf();
     $result = register_student($mysqli, $_POST);
     if ($result['success']) {
-        set_flash('success', $result['message'] ?? 'Registration successful! Check your email to verify your account.');
+        if (!MAIL_ENABLED && !empty($result['verify_token'])) {
+            $_SESSION['dev_verify_url'] = app_url('auth/verify-email.php?token=' . urlencode($result['verify_token']));
+            set_flash('success', 'Registration successful! Email sending is disabled on localhost — use the verification link shown below.');
+        } else {
+            set_flash('success', $result['message'] ?? 'Registration successful! Check your email to verify your account.');
+        }
         redirect(app_url('auth/login.php'));
     }
     $error = $result['error'];

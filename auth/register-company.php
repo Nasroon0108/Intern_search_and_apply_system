@@ -18,7 +18,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_valid_csrf();
     $result = register_company($mysqli, $_POST);
     if ($result['success']) {
-        set_flash('success', 'Registration submitted! Check your email to verify your account, then an admin will review your company profile.');
+        if (!MAIL_ENABLED && !empty($result['verify_token'])) {
+            $_SESSION['dev_verify_url'] = app_url('auth/verify-email.php?token=' . urlencode($result['verify_token']));
+            set_flash('success', 'Registration submitted! Email sending is disabled on localhost — use the verification link shown below, then wait for admin approval.');
+        } else {
+            set_flash('success', 'Registration submitted! Check your email to verify your account, then an admin will review your company profile.');
+        }
         redirect(app_url('auth/login.php'));
     }
     $error = $result['error'];

@@ -157,10 +157,15 @@ function register_student(mysqli $db, array $data): array
 
         $db->commit();
 
-        // Send verification email
+        // Send verification email (skipped on localhost — see MAIL_ENABLED)
         send_verification_email($email, $token);
 
-        return ['success' => true, 'user_id' => $userId, 'message' => 'Registration successful! Check your email to verify your account.'];
+        return [
+            'success' => true,
+            'user_id' => $userId,
+            'verify_token' => $token,
+            'message' => 'Registration successful! Check your email to verify your account.',
+        ];
     } catch (Throwable $e) {
         $db->rollback();
         return ['success' => false, 'error' => 'Registration failed. Please try again.'];
@@ -231,10 +236,15 @@ function register_company(mysqli $db, array $data): array
 
         $db->commit();
 
-        // Send verification email
+        // Send verification email (skipped on localhost — see MAIL_ENABLED)
         send_verification_email($email, $token);
 
-        return ['success' => true, 'user_id' => $userId, 'message' => 'Registration successful! Check your email to verify your account.'];
+        return [
+            'success' => true,
+            'user_id' => $userId,
+            'verify_token' => $token,
+            'message' => 'Registration successful! Check your email to verify your account.',
+        ];
     } catch (Throwable $e) {
         $db->rollback();
         return ['success' => false, 'error' => 'Registration failed. Please try again.'];
@@ -290,16 +300,32 @@ function verify_email(mysqli $db, string $token): array
     }
 
     if ($verification['verified_at']) {
-        return ['success' => false, 'error' => 'Email already verified.'];
+        return ['success' => true, 'message' => 'Email already verified. You can log in.'];
     }
 
-    $userId = $verification['user_id'];
-    
+    $userId = (int) $verification['user_id'];
+
+    $stmt = $db->prepare('SELECT role, status FROM users WHERE id = ? LIMIT 1');
+    $stmt->bind_param('i', $userId);
+    $stmt->execute();
+    $user = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if (!$user) {
+        return ['success' => false, 'error' => 'User account not found.'];
+    }
+
     $db->begin_transaction();
     try {
-        $stmt = $db->prepare('UPDATE users SET email_verified = 1, status = ? WHERE id = ?');
-        $status = STATUS_ACTIVE;
-        $stmt->bind_param('si', $status, $userId);
+        // Companies stay pending until an admin approves the company profile
+        if ($user['role'] === ROLE_COMPANY && $user['status'] === STATUS_PENDING) {
+            $stmt = $db->prepare('UPDATE users SET email_verified = 1 WHERE id = ?');
+            $stmt->bind_param('i', $userId);
+        } else {
+            $stmt = $db->prepare('UPDATE users SET email_verified = 1, status = ? WHERE id = ?');
+            $status = STATUS_ACTIVE;
+            $stmt->bind_param('si', $status, $userId);
+        }
         $stmt->execute();
         $stmt->close();
 
@@ -314,6 +340,29 @@ function verify_email(mysqli $db, string $token): array
         $db->rollback();
         return ['success' => false, 'error' => 'Verification failed. Please try again.'];
     }
+}
+
+/**
+ * Admin helper: mark a user's email as verified without a token
+ */
+function mark_email_verified(mysqli $db, int $userId): bool
+{
+    $stmt = $db->prepare('UPDATE users SET email_verified = 1 WHERE id = ?');
+    $stmt->bind_param('i', $userId);
+    $ok = $stmt->execute();
+    $stmt->close();
+
+    if ($ok) {
+        $stmt = $db->prepare(
+            'UPDATE email_verifications SET verified_at = NOW()
+             WHERE user_id = ? AND verified_at IS NULL'
+        );
+        $stmt->bind_param('i', $userId);
+        $stmt->execute();
+        $stmt->close();
+    }
+
+    return $ok;
 }
 
 /**
