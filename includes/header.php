@@ -45,9 +45,6 @@ $onHomePage = $currentScript === 'index.php';
                     <a class="nav-link" href="<?= e(app_url('index.php')) ?>">Home</a>
                 </li>
                 <?php endif; ?>
-                <li class="nav-item">
-                    <a class="nav-link" href="<?= e(app_url('internships.php')) ?>">Explore</a>
-                </li>
                 <?php if (!$onDashboardPage && !$onHomePage): ?>
                 <?php if ($isLoggedIn && $userRole === ROLE_STUDENT): ?>
                     <li class="nav-item"><a class="nav-link" href="<?= e(app_url('student/dashboard.php')) ?>">Dashboard</a></li>
@@ -80,13 +77,6 @@ $onHomePage = $currentScript === 'index.php';
                     </li>
                 <?php else: ?>
                     <li class="nav-item"><a class="nav-link" href="<?= e(app_url('auth/login.php')) ?>">Login</a></li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Register</a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="<?= e(app_url('auth/register-student.php')) ?>">As Student</a></li>
-                            <li><a class="dropdown-item" href="<?= e(app_url('auth/register-company.php')) ?>">As Company</a></li>
-                        </ul>
-                    </li>
                 <?php endif; ?>
             </ul>
         </div>

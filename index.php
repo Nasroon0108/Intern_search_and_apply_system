@@ -28,69 +28,69 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 </section>
 
-<section class="py-5">
+<section class="py-5 home-how">
     <div class="container">
         <div class="text-center mb-5">
             <h2 class="h3">How It Works</h2>
-            <p class="text-muted">Simple steps for students and companies</p>
+            <p class="home-section-lead">Simple steps for students and companies</p>
         </div>
         <div class="row g-4">
             <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm text-center p-4">
-                    <div class="feature-icon bg-primary-subtle text-primary rounded-circle mx-auto mb-3">
+                <div class="card home-step-card h-100 text-center p-4">
+                    <div class="feature-icon feature-icon-blue rounded-circle mx-auto mb-3">
                         <i class="bi bi-person-plus fs-3"></i>
                     </div>
                     <h3 class="h5">1. Register</h3>
-                    <p class="text-muted small mb-0">Students and companies create accounts with secure login.</p>
+                    <p class="home-step-text small mb-0">Students and companies create accounts with secure login.</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm text-center p-4">
-                    <div class="feature-icon bg-success-subtle text-success rounded-circle mx-auto mb-3">
+                <div class="card home-step-card h-100 text-center p-4">
+                    <div class="feature-icon feature-icon-green rounded-circle mx-auto mb-3">
                         <i class="bi bi-search fs-3"></i>
                     </div>
-                    <h3 class="h5">2. Search & Apply</h3>
-                    <p class="text-muted small mb-0">Browse internships with filters and apply with your CV online.</p>
+                    <h3 class="h5">2. Search &amp; Apply</h3>
+                    <p class="home-step-text small mb-0">Browse internships with filters and apply with your CV online.</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm text-center p-4">
-                    <div class="feature-icon bg-warning-subtle text-warning rounded-circle mx-auto mb-3">
+                <div class="card home-step-card h-100 text-center p-4">
+                    <div class="feature-icon feature-icon-amber rounded-circle mx-auto mb-3">
                         <i class="bi bi-graph-up-arrow fs-3"></i>
                     </div>
                     <h3 class="h5">3. Track Progress</h3>
-                    <p class="text-muted small mb-0">Monitor application status from pending to accepted.</p>
+                    <p class="home-step-text small mb-0">Monitor application status from pending to accepted.</p>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<section class="bg-light py-5">
+<section class="home-stats py-5">
     <div class="container">
         <div class="row text-center g-4">
             <div class="col-6 col-md-3">
-                <div class="stat-card">
+                <div class="home-stat">
                     <div class="display-6 fw-bold text-primary">25</div>
-                    <div class="text-muted small">Districts</div>
+                    <div class="home-step-text small">Districts</div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="stat-card">
+                <div class="home-stat">
                     <div class="display-6 fw-bold text-primary">3</div>
-                    <div class="text-muted small">User Roles</div>
+                    <div class="home-step-text small">User Roles</div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="stat-card">
+                <div class="home-stat">
                     <div class="display-6 fw-bold text-primary">100%</div>
-                    <div class="text-muted small">Online Apply</div>
+                    <div class="home-step-text small">Online Apply</div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="stat-card">
+                <div class="home-stat">
                     <div class="display-6 fw-bold text-primary">SL</div>
-                    <div class="text-muted small">Sri Lanka Focus</div>
+                    <div class="home-step-text small">Sri Lanka Focus</div>
                 </div>
             </div>
         </div>

@@ -66,6 +66,38 @@ body.ic-public {
     justify-content: center;
 }
 
+.feature-icon-blue {
+    background: #eff6ff;
+    color: #1349cc;
+}
+.feature-icon-green {
+    background: #f0fdf4;
+    color: #15803d;
+}
+.feature-icon-amber {
+    background: #fffbeb;
+    color: #b45309;
+}
+
+.home-section-lead,
+.home-step-text {
+    color: var(--ic-text-muted);
+}
+
+.home-step-card {
+    border: 1px solid var(--ic-border);
+    background: var(--ic-surface);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.home-stats {
+    background: #f3f5f9;
+}
+
+.home-stat {
+    padding: 1rem;
+}
+
 .stat-widget .card-body { padding: 1.25rem; }
 .stat-card { padding: 1rem; }
 
@@ -1485,6 +1517,51 @@ body.ic-app {
     background-color: var(--ic-surface);
     border-color: var(--ic-border);
     color: var(--ic-text);
+}
+
+[data-bs-theme="dark"] .home-step-card {
+    background: #1e2433;
+    border: 1px solid #3a4458;
+    box-shadow: none;
+}
+
+[data-bs-theme="dark"] .home-step-card h3,
+[data-bs-theme="dark"] .home-how h2 {
+    color: var(--ic-text);
+}
+
+[data-bs-theme="dark"] .home-section-lead,
+[data-bs-theme="dark"] .home-step-text {
+    color: #c5cad3;
+}
+
+[data-bs-theme="dark"] .feature-icon-blue {
+    background: rgba(91, 141, 239, 0.28);
+    color: #93c5fd;
+}
+
+[data-bs-theme="dark"] .feature-icon-green {
+    background: rgba(34, 197, 94, 0.28);
+    color: #86efac;
+}
+
+[data-bs-theme="dark"] .feature-icon-amber {
+    background: rgba(245, 158, 11, 0.28);
+    color: #fcd34d;
+}
+
+[data-bs-theme="dark"] .home-stats {
+    background: #151922;
+    border-top: 1px solid var(--ic-border);
+    border-bottom: 1px solid var(--ic-border);
+}
+
+[data-bs-theme="dark"] .home-stats .text-primary {
+    color: #7aa3f5 !important;
+}
+
+[data-bs-theme="dark"] .bg-light {
+    background-color: #151922 !important;
 }
 
 [data-bs-theme="dark"] .card-header {
