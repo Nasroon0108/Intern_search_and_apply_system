@@ -168,7 +168,7 @@ $stmt->close();
                     <tr>
                         <th>Candidate</th>
                         <th>Internship</th>
-                        <th>CV</th>
+                        <th>Documents</th>
                         <th>Applied</th>
                         <th>Current Status</th>
                         <th>Action</th>
@@ -180,29 +180,30 @@ $stmt->close();
                             <td>
                                 <strong><?= e($app['full_name']) ?></strong><br>
                                 <small class="text-muted"><?= e($app['email']) ?></small>
-                                <?php if (!empty($app['cover_letter'])): ?>
-                                    <br>
-                                    <button type="button"
-                                            class="btn btn-link btn-sm p-0 mt-1"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#coverLetterModal<?= (int)$app['id'] ?>">
-                                        View cover letter
-                                    </button>
-                                <?php endif; ?>
                             </td>
                             <td><?= e($app['title']) ?></td>
                             <td>
-                                <?php if (!empty($app['cv_id']) && !empty($app['cv_file'])): ?>
-                                    <a href="<?= e(app_url('company/download-cv.php?application_id=' . (int)$app['id'])) ?>"
-                                       class="btn btn-sm btn-outline-primary"
-                                       target="_blank"
-                                       rel="noopener">
-                                        <i class="bi bi-file-earmark-pdf"></i>
-                                        <?= e($app['cv_title'] ?: 'View CV') ?>
-                                    </a>
-                                <?php else: ?>
-                                    <span class="text-muted small">No CV</span>
-                                <?php endif; ?>
+                                <div class="d-flex flex-wrap gap-1">
+                                    <?php if (!empty($app['cv_id']) && !empty($app['cv_file'])): ?>
+                                        <a href="<?= e(app_url('company/download-cv.php?application_id=' . (int)$app['id'])) ?>"
+                                           class="btn btn-sm btn-outline-primary"
+                                           target="_blank"
+                                           rel="noopener">
+                                            <i class="bi bi-file-earmark-pdf me-1"></i>View CV
+                                        </a>
+                                    <?php else: ?>
+                                        <span class="text-muted small align-self-center">No CV</span>
+                                    <?php endif; ?>
+
+                                    <?php if (!empty($app['cover_letter'])): ?>
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-secondary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#coverLetterModal<?= (int)$app['id'] ?>">
+                                            <i class="bi bi-envelope-open me-1"></i>Cover Letter
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                             <td><?= e(date('M j, Y', strtotime($app['applied_at']))) ?></td>
                             <td>
