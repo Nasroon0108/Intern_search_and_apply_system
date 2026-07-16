@@ -1,7 +1,6 @@
 # Uploads (keep folder structure via .gitkeep)
 uploads/cvs/*
 uploads/photos/*
-uploads/cover_letters/*
 uploads/logos/*
 !uploads/**/.gitkeep
 
