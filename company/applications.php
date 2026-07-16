@@ -51,14 +51,16 @@ $stmt->close();
 $totalPages = ceil($totalRows / $perPage);
 $offset = ($page - 1) * $perPage;
 
-// Get applications
+// Get applications (include submitted CV when available)
 $query = "
-    SELECT a.*, i.title, s.full_name, u.email, c.logo
+    SELECT a.id, a.status, a.applied_at, a.cover_letter, a.cv_id,
+           i.title, s.full_name, u.email,
+           cv.title AS cv_title, cv.file_path AS cv_file
     FROM applications a
     JOIN internships i ON i.id = a.internship_id
     JOIN students s ON s.id = a.student_id
     JOIN users u ON u.id = s.user_id
-    JOIN companies c ON c.id = i.company_id
+    LEFT JOIN student_cvs cv ON cv.id = a.cv_id
     WHERE $where
     ORDER BY a.applied_at DESC
     LIMIT ? OFFSET ?
@@ -166,6 +168,7 @@ $stmt->close();
                     <tr>
                         <th>Candidate</th>
                         <th>Internship</th>
+                        <th>CV</th>
                         <th>Applied</th>
                         <th>Current Status</th>
                         <th>Action</th>
@@ -175,13 +178,32 @@ $stmt->close();
                     <?php foreach ($applications as $app): ?>
                         <tr>
                             <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <strong><?= e($app['full_name']) ?></strong>
+                                <strong><?= e($app['full_name']) ?></strong><br>
+                                <small class="text-muted"><?= e($app['email']) ?></small>
+                                <?php if (!empty($app['cover_letter'])): ?>
                                     <br>
-                                    <small class="text-muted"><?= e($app['email']) ?></small>
-                                </div>
+                                    <button type="button"
+                                            class="btn btn-link btn-sm p-0 mt-1"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#coverLetterModal<?= (int)$app['id'] ?>">
+                                        View cover letter
+                                    </button>
+                                <?php endif; ?>
                             </td>
                             <td><?= e($app['title']) ?></td>
+                            <td>
+                                <?php if (!empty($app['cv_id']) && !empty($app['cv_file'])): ?>
+                                    <a href="<?= e(app_url('company/download-cv.php?application_id=' . (int)$app['id'])) ?>"
+                                       class="btn btn-sm btn-outline-primary"
+                                       target="_blank"
+                                       rel="noopener">
+                                        <i class="bi bi-file-earmark-pdf"></i>
+                                        <?= e($app['cv_title'] ?: 'View CV') ?>
+                                    </a>
+                                <?php else: ?>
+                                    <span class="text-muted small">No CV</span>
+                                <?php endif; ?>
+                            </td>
                             <td><?= e(date('M j, Y', strtotime($app['applied_at']))) ?></td>
                             <td>
                                 <span class="badge bg-<?= e($app['status'] === 'pending' ? 'warning' : ($app['status'] === 'shortlisted' ? 'info' : ($app['status'] === 'interview' ? 'primary' : ($app['status'] === 'accepted' ? 'success' : 'danger')))) ?> text-capitalize">
@@ -243,6 +265,24 @@ $stmt->close();
                 </tbody>
             </table>
         </div>
+
+        <?php foreach ($applications as $app): ?>
+            <?php if (!empty($app['cover_letter'])): ?>
+            <div class="modal fade" id="coverLetterModal<?= (int)$app['id'] ?>" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Cover letter — <?= e($app['full_name']) ?></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="mb-0" style="white-space: pre-wrap;"><?= e($app['cover_letter']) ?></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
+        <?php endforeach; ?>
 
         <?php if ($totalPages > 1): ?>
             <nav class="mt-4">
