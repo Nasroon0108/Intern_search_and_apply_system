@@ -332,5 +332,8 @@ INSERT INTO skills (category_id, name) VALUES
     (4, 'Teamwork'), (4, 'Presentation'),
     (5, 'Project Management');
 
--- Default admin: run setup/seed_admin.php after importing schema
--- Email: admin@internconnect.lk | Password: Admin@123
+-- Default admin is NOT created here.
+-- After importing this file, open in browser:
+--   setup/seed_admin.php
+-- Email: admin@internconnect.local | Password: Admin123
+-- Then (optional demo data): setup/seed_data.php

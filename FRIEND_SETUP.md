@@ -106,18 +106,22 @@ define('APP_URL', 'http://localhost/Intern_search_and_apply_system');
 
 ## Step 6 — Create the Admin account (required)
 
-Open this URL once:
+Importing `schema.sql` does **not** create a login. She must open this URL once:
 
 ```
 http://localhost/Intern_search_and_apply_system/setup/seed_admin.php
 ```
 
-You should see a success message with:
+She should see a success page with:
 
 | Field | Value |
 |-------|-------|
 | **Email** | `admin@internconnect.local` |
 | **Password** | `Admin123` |
+
+Then go to Login and use those exact credentials (case-sensitive).
+
+**If login keeps failing:** open `seed_admin.php` again (it resets the password), then retry. Do not use `Admin@123` or `admin123` — those are wrong.
 
 ---
 
